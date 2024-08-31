@@ -54,6 +54,20 @@ public:
         }
     }
 
+    static void sub_backprop(std::shared_ptr<tensor>& a, std::shared_ptr<tensor>& b, const tensor& output) {
+        for (int i = 0; i < output.grad.size(); ++i) {
+            a->grad[i] += output.grad[i];
+            b->grad[i] += -1*output.grad[i];
+        }
+    }
+
+    static void mul_backprop(std::shared_ptr<tensor>& a, std::shared_ptr<tensor>& b, const tensor& output) {
+        for (int i = 0; i < output.grad.size(); ++i) {
+            a->grad[i] += b->data[i]*output.grad[i];
+            b->grad[i] += a->data[i]*output.grad[i];
+        }
+    }
+
     static std::shared_ptr<tensor> add(std::shared_ptr<tensor> a, std::shared_ptr<tensor> b) {
         assert(a->dims.size() == b->dims.size() && "Dimensions of tensors being added should be the same");
         bool shape_flag = true;
@@ -75,14 +89,67 @@ public:
         return output;
     }
 
+    static std::shared_ptr<tensor> mul(std::shared_ptr<tensor> a, std::shared_ptr<tensor> b) {
+        assert(a->dims.size() == b->dims.size() && "Dimensions of tensors being added should be the same");
+        bool shape_flag = true;
+        for (int i = 0; i < a->dims.size(); ++i) {
+            if (a->dims[i] != b->dims[i]) {
+                shape_flag = false;
+                break;
+            }
+        }
+        assert(shape_flag && "Shape of Tensors not same");
+
+        auto output = std::make_shared<tensor>(a->dims);
+        output->operation = op::mul;
+        output->previous_nodes.push_back(a);
+        output->previous_nodes.push_back(b);
+        for (int i = 0; i < a->data.size(); ++i) {
+            output->data[i] = a->data[i] * b->data[i];
+        }
+        return output;
+    }
+
+    static std::shared_ptr<tensor> sub(std::shared_ptr<tensor> a, std::shared_ptr<tensor> b) {
+        assert(a->dims.size() == b->dims.size() && "Dimensions of tensors being added should be the same");
+        bool shape_flag = true;
+        for (int i = 0; i < a->dims.size(); ++i) {
+            if (a->dims[i] != b->dims[i]) {
+                shape_flag = false;
+                break;
+            }
+        }
+        assert(shape_flag && "Shape of Tensors not same");
+
+        auto output = std::make_shared<tensor>(a->dims);
+        output->operation = op::sub;
+        output->previous_nodes.push_back(a);
+        output->previous_nodes.push_back(b);
+        for (int i = 0; i < a->data.size(); ++i) {
+            output->data[i] = a->data[i] - b->data[i];
+        }
+        return output;
+    }
+
     static void recursive_backprop(std::shared_ptr<tensor> cur) {
         if (cur->operation == op::add) {
             add_backprop(cur->previous_nodes[0], cur->previous_nodes[1], *cur);
-            if (cur->previous_nodes[0]->operation != op::none)
-                recursive_backprop(cur->previous_nodes[0]);
-            if (cur->previous_nodes[1]->operation != op::none)
-                recursive_backprop(cur->previous_nodes[1]);
         }
+        else if(cur->operation == op::sub)
+        {
+            sub_backprop(cur->previous_nodes[0], cur->previous_nodes[1], *cur);
+        }
+        else if(cur->operation == op::mul)
+        {
+            mul_backprop(cur->previous_nodes[0], cur->previous_nodes[1], *cur);
+        }
+
+        if (cur->previous_nodes[0]->operation != op::none)
+            recursive_backprop(cur->previous_nodes[0]);
+
+        if (cur->previous_nodes[1]->operation != op::none)
+            recursive_backprop(cur->previous_nodes[1]);
+
     }
 
     void backprop() {
@@ -96,13 +163,24 @@ std::shared_ptr<tensor<T>> operator+(std::shared_ptr<tensor<T>> a, std::shared_p
     return tensor<T>::add(a, b);
 }
 
+template <typename T>
+std::shared_ptr<tensor<T>> operator*(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b) {
+    return tensor<T>::mul(a, b);
+}
+
+template <typename T>
+std::shared_ptr<tensor<T>> operator-(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b) {
+    return tensor<T>::sub(a, b);
+}
+
+
 int main() {
     auto t1 = std::make_shared<tensor<float>>(std::vector<int>{2});
     auto t2 = std::make_shared<tensor<float>>(std::vector<int>{2});
     t1->data = {1.0, 3.0};
     t2->data = {1.0, 4.0};
 
-    auto res = t1 + t2;
+    auto res = t1 * t2;
     std::cout << *res << std::endl;
     std::cout << "Total of res: " << res->total << std::endl;
     std::cout << "Operation: " << static_cast<int>(res->operation) << std::endl;

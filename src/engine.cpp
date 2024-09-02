@@ -180,7 +180,7 @@ int main() {
     t1->data = {1.0, 3.0};
     t2->data = {1.0, 4.0};
 
-    auto res = t1 * t2;
+    auto res = t1*t1 + t2 + t2 * t2;
     std::cout << *res << std::endl;
     std::cout << "Total of res: " << res->total << std::endl;
     std::cout << "Operation: " << static_cast<int>(res->operation) << std::endl;

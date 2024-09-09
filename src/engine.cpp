@@ -88,8 +88,8 @@ public:
         auto grad = std::make_shared<tensor>(output.dims);
         grad->data = output.grad;
 
-        auto res1 = tensor<type>::matmul(grad,tensor<type>::transpose(b,b->dims.size()-1,b->dims.size()-2));
-        auto res2 = tensor<type>::matmul(tensor<type>::transpose(a,a->dims.size()-1,a->dims.size()-2),grad);
+        auto res1 = tensor<type>::matmul(grad, tensor<type>::transpose(b, b->dims.size() - 1, b->dims.size() - 2));
+        auto res2 = tensor<type>::matmul(tensor<type>::transpose(a, a->dims.size() - 1, a->dims.size() - 2), grad);
 
         a->grad = res1->data;
         b->grad = res2->data;
@@ -264,11 +264,15 @@ public:
         for (int count = 0; count < total_elements; ++count)
         {
             int original_idx = 0;
+            std::cout << "counts: ";
+            for (auto ele : counts)
+                std::cout << ele << " ";
+            std::cout << std::endl;
             for (int i = 0; i < strides.size(); ++i)
             {
                 original_idx += counts[i] * strides[i];
             }
-
+            std::cout << "idx: " << original_idx << std::endl;
             output->data[count] = a->data[original_idx];
 
             // Increment the multi-dimensional index
@@ -326,9 +330,41 @@ std::shared_ptr<tensor<T>> operator+(std::shared_ptr<tensor<T>> a, std::shared_p
 }
 
 template <typename T>
+std::shared_ptr<tensor<T>> operator+(std::shared_ptr<tensor<T>> a, T b)
+{
+    auto tensorised_scalar = std::make_shared<tensor<T>>(a->dims);
+    tensorised_scalar->data = std::vector<T>(tensorised_scalar->total, b);
+    return tensor<T>::add(a, tensorised_scalar);
+}
+
+template <typename T>
+std::shared_ptr<tensor<T>> operator+(T a, std::shared_ptr<tensor<T>> b)
+{
+    auto tensorised_scalar = std::make_shared<tensor<T>>(b->dims);
+    tensorised_scalar->data = std::vector<T>(tensorised_scalar->total, a);
+    return tensor<T>::add(b, tensorised_scalar);
+}
+
+template <typename T>
 std::shared_ptr<tensor<T>> operator*(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b)
 {
     return tensor<T>::mul(a, b);
+}
+
+template <typename T>
+std::shared_ptr<tensor<T>> operator*(std::shared_ptr<tensor<T>> a, T b)
+{
+    auto tensorised_scalar = std::make_shared<tensor<T>>(a->dims);
+    tensorised_scalar->data = std::vector<T>(tensorised_scalar->total, b);
+    return tensor<T>::mul(a, tensorised_scalar);
+}
+
+template <typename T>
+std::shared_ptr<tensor<T>> operator*(T a, std::shared_ptr<tensor<T>> b)
+{
+    auto tensorised_scalar = std::make_shared<tensor<T>>(b->dims);
+    tensorised_scalar->data = std::vector<T>(tensorised_scalar->total, a);
+    return tensor<T>::mul(b, tensorised_scalar);
 }
 
 template <typename T>
@@ -337,9 +373,25 @@ std::shared_ptr<tensor<T>> operator-(std::shared_ptr<tensor<T>> a, std::shared_p
     return tensor<T>::sub(a, b);
 }
 
+template <typename T>
+std::shared_ptr<tensor<T>> operator-(std::shared_ptr<tensor<T>> a, T b)
+{
+    auto tensorised_scalar = std::make_shared<tensor<T>>(a->dims);
+    tensorised_scalar->data = std::vector<T>(tensorised_scalar->total, b);
+    return tensor<T>::sub(a, tensorised_scalar);
+}
+
+template <typename T>
+std::shared_ptr<tensor<T>> operator-(T a, std::shared_ptr<tensor<T>> b)
+{
+    auto tensorised_scalar = std::make_shared<tensor<T>>(b->dims);
+    tensorised_scalar->data = std::vector<T>(tensorised_scalar->total, a);
+    return tensor<T>::sub(b, tensorised_scalar);
+}
+
 int main()
 {
-    auto t1 = std::make_shared<tensor<float>>(std::vector<int>{2});
+    /* auto t1 = std::make_shared<tensor<float>>(std::vector<int>{2});
     auto t2 = std::make_shared<tensor<float>>(std::vector<int>{2});
     t1->data = {1.0, 3.0};
     t2->data = {1.0, 4.0};
@@ -352,16 +404,16 @@ int main()
     res->backprop();
     std::cout << "Backpropagation result:\n";
     std::cout << *t1 << std::endl;
-    std::cout << *t2 << std::endl;
+    std::cout << *t2 << std::endl; */
 
     /* auto t3 = std::make_shared<tensor<float>>(std::vector<int>{5, 3, 2});
     t3->data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30};
 
     std::cout << "Transpose function res" << std::endl;
     std::cout << *t3 << std::endl;
-    std::cout << *tensor<float>::transpose(t3, 0, 2) << std::endl; */
+    std::cout << *tensor<float>::transpose(t3, 0, 1) << std::endl; */
 
-    auto m1 = std::make_shared<tensor<float>>(std::vector<int>{2,2,2,2});
+    /* auto m1 = std::make_shared<tensor<float>>(std::vector<int>{2,2,2,2});
     auto m2 = std::make_shared<tensor<float>>(std::vector<int>{2,2,2,3});
     m1->data = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
     m2->data = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24};
@@ -373,7 +425,13 @@ int main()
     res2->backprop();
     std::cout << "Backpropagation result:\n";
     std::cout << *m1 << std::endl;
-    std::cout << *m2 << std::endl;
+    std::cout << *m2 << std::endl; */
+
+    auto t3 = std::make_shared<tensor<float>>(std::vector<int>{5, 3, 2});
+    t3->data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30};
+
+    auto res = t3 * 2.0f;
+    std::cout << *res << std::endl;
 
     return 0;
 }

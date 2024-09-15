@@ -44,7 +44,14 @@ jobs:
     - name: Install Dependencies
       if: runner.os == 'Windows'
       run: choco install ninja
-      
+    
+    - name: Set reusable strings
+      id: strings_for_windows
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}\\build" >> "$GITHUB_OUTPUT"
+      if: runner.os == 'Windows'
+
     - name: Set reusable strings
       id: strings
       shell: bash

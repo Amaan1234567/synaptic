@@ -34,7 +34,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 # Link gtest and gtest_main libraries to test1
-target_link_libraries(test1 gtest gtest_main pthread)
+target_link_libraries(test1 gtest gtest_main)
 
 # Register the test
 add_test(NAME basic_add_op_test COMMAND test1)

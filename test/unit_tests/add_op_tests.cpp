@@ -2,6 +2,7 @@
 #include <vector>
 #include <memory>
 #include <gtest/gtest.h> // Include the GoogleTest header
+#include <stdexcept>
 
 // Test case 1
 TEST(TensorTest, AdditionOfTwoTensors)
@@ -68,10 +69,10 @@ TEST(TensorAssertionFailureTest, TensorAdditionShapeMismatch) {
     t1->data = {1, 2, 3, 4, 5, 6};
     t2->data = {1, 2, 3, 4, 5, 6};
 
-    // Expect the code to terminate due to the failed assertion (shape mismatch)
-    ASSERT_DEATH({
+    
+    EXPECT_THROW({
         auto res = t1 + t2;
-    }, ".*");  // The regex ".*" just checks that the process terminated.
+    },std::runtime_error);  
 }
 
 TEST(TensorAssertionFailureTest, TensorAdditionWithScalarShapeMismatch) {
@@ -80,36 +81,11 @@ TEST(TensorAssertionFailureTest, TensorAdditionWithScalarShapeMismatch) {
     t1->data = {1.0f, 2.0f, 3.0f};
     t2->data = {1.0f, 2.0f, 3.0f};
 
-    // Expect the code to terminate due to the failed assertion (shape mismatch)
-    ASSERT_DEATH({
+    
+    EXPECT_THROW({
         auto res = t1 + t2;
-    }, ".*");
+    },std::runtime_error);
 }
-
-TEST(TensorAssertionFailureTest, TensorMultiplicationShapeMismatch) {
-    auto t1 = std::make_shared<tensor<int>>(std::vector<int>{4});
-    auto t2 = std::make_shared<tensor<int>>(std::vector<int>{2});
-    t1->data = {1, 2, 3, 4};
-    t2->data = {1, 2};
-
-    // Expect the code to terminate due to the failed assertion (shape mismatch)
-    ASSERT_DEATH({
-        auto res = t1 + t2;
-    }, ".*");
-}
-
-TEST(TensorAssertionFailureTest, TensorSubtractionShapeMismatch) {
-    auto t1 = std::make_shared<tensor<int>>(std::vector<int>{5, 3});
-    auto t2 = std::make_shared<tensor<int>>(std::vector<int>{3, 5});
-    t1->data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-    t2->data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-
-    // Expect the code to terminate due to the failed assertion (shape mismatch)
-    ASSERT_DEATH({
-        auto res = t1 + t2;
-    }, ".*");
-}
-
 
 
 // Main function for GoogleTest

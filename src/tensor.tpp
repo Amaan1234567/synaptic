@@ -3,6 +3,7 @@
 #include <memory>
 #include <cassert>
 #include <algorithm>
+#include <stdexcept>
 #include "../include/op_enum.hpp"
 //#include "../include/tensor.hpp"
 
@@ -66,7 +67,11 @@ void tensor<T>::matmul_backprop(std::shared_ptr<tensor<T>> &a, std::shared_ptr<t
 template <typename T>
 std::shared_ptr<tensor<T>> tensor<T>::add(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b)
 {
-    assert(a->dims.size() == b->dims.size() && "Number of Dimensions of tensors being added should be the same");
+    
+    if (a->dims.size() != b->dims.size()) {
+            throw std::runtime_error("Number of Dimensions of tensors being added should be the same");
+    }
+    
     bool shape_flag = true;
     for (int i = 0; i < a->dims.size(); ++i)
     {
@@ -76,7 +81,9 @@ std::shared_ptr<tensor<T>> tensor<T>::add(std::shared_ptr<tensor<T>> a, std::sha
             break;
         }
     }
-    assert(shape_flag && "Shape of Tensors not same");
+    if (!shape_flag) {
+            throw std::runtime_error("Shape mismatch during addition");
+    }
 
     auto output = std::make_shared<tensor>(a->dims);
     output->operation = op::add;

@@ -36,7 +36,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    
+    - name: Install Dependencies
+      if: runner.os == 'Linux'
+      run: sudo apt-get install -y ninja-build
 
+    - name: Install Dependencies
+      if: runner.os == 'Windows'
+      run: choco install ninja
+      
     - name: Set reusable strings
       id: strings
       shell: bash

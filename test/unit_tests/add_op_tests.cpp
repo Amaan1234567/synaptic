@@ -1,122 +1,120 @@
 #include "../../include/tensor.hpp"
 #include <vector>
 #include <memory>
-#include <iostream>
+#include <gtest/gtest.h> // Include the GoogleTest header
 
-
-bool test1()
+// Test case 1
+TEST(TensorTest, AdditionOfTwoTensors)
 {
     auto t1 = std::make_shared<tensor<float>>(std::vector<int>{2});
     auto t2 = std::make_shared<tensor<float>>(std::vector<int>{2});
     t1->data = {1.0, 3.0};
     t2->data = {1.0, 4.0};
 
-    auto res = t1+t2 ;
-    std::cout << *(res) << std::endl;
+    auto res = t1 + t2;
     std::vector<float> expected = {2.0, 7.0};
-    for (int i = 0; i < res->total; i++)
-    {
-        if (res->data[i] != expected[i])
-        {
-            return false;
-        }
+
+    for (int i = 0; i < res->total; i++) {
+        EXPECT_FLOAT_EQ(res->data[i], expected[i]);  // Using EXPECT_FLOAT_EQ for floating point comparison
     }
-    return true;
 }
 
-bool test2()
+// Test case 2
+TEST(TensorTest, AdditionWithScalar)
 {
     auto t3 = std::make_shared<tensor<int>>(std::vector<int>{5, 3, 2});
     t3->data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30};
 
-    auto res = t3+1;
-    std::vector<int> expected = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,31};
-    std::cout << *(res) << std::endl; 
-    for (int i = 0; i < res->total; i++)
-    {
-        if (res->data[i] != expected[i])
-        {
-            return false;
-        }
-    }
-    return true;
+    auto res = t3 + 1;
+    std::vector<int> expected = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
 
+    for (int i = 0; i < res->total; i++) {
+        EXPECT_EQ(res->data[i], expected[i]);  // Using EXPECT_EQ for integer comparison
+    }
 }
 
-bool test3()
+// Test case 3
+TEST(TensorTest, ScalarAdditionToTensor)
 {
     auto t4 = std::make_shared<tensor<int>>(std::vector<int>{5, 3, 2});
     t4->data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30};
 
-    auto res = 1+t4;
-    std::vector<int> expected = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,30, 31};
-    for (int i = 0; i < res->total; i++)
-    {
-        if (res->data[i] != expected[i])
-        {
-            return false;
-        }
+    auto res = 1 + t4;
+    std::vector<int> expected = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
+
+    for (int i = 0; i < res->total; i++) {
+        EXPECT_EQ(res->data[i], expected[i]);
     }
-    return true;
 }
 
-bool test4()
+// Test case 4
+TEST(TensorTest, FloatingPointAdditionWithScalar)
 {
     auto t5 = std::make_shared<tensor<float>>(std::vector<int>{5, 3, 2});
     t5->data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30};
 
-    auto res = 1.5f+t5;
-    std::vector<float> expected = {2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10.5, 11.5, 12.5, 13.5, 14.5, 15.5, 16.5, 17.5, 18.5, 19.5, 20.5, 21.5, 22.5, 23.5, 24.5, 25.5, 26.5, 27.5, 28.5, 29.5,30.5, 31.5};
-    for (int i = 0; i < res->total; i++)
-    {
-        if (res->data[i] != expected[i])
-        {
-            return false;
-        }
+    auto res = 1.5f + t5;
+    std::vector<float> expected = {2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10.5, 11.5, 12.5, 13.5, 14.5, 15.5, 16.5, 17.5, 18.5, 19.5, 20.5, 21.5, 22.5, 23.5, 24.5, 25.5, 26.5, 27.5, 28.5, 29.5, 30.5, 31.5};
+
+    for (int i = 0; i < res->total; i++) {
+        EXPECT_FLOAT_EQ(res->data[i], expected[i]);
     }
-    return true;
 }
 
-int main()
+// Test cases where the shape mismatch triggers an assertion failure
+TEST(TensorAssertionFailureTest, TensorAdditionShapeMismatch) {
+    auto t1 = std::make_shared<tensor<int>>(std::vector<int>{2, 3});
+    auto t2 = std::make_shared<tensor<int>>(std::vector<int>{3, 2});
+    t1->data = {1, 2, 3, 4, 5, 6};
+    t2->data = {1, 2, 3, 4, 5, 6};
+
+    // Expect the code to terminate due to the failed assertion (shape mismatch)
+    ASSERT_DEATH({
+        auto res = t1 + t2;
+    }, ".*");  // The regex ".*" just checks that the process terminated.
+}
+
+TEST(TensorAssertionFailureTest, TensorAdditionWithScalarShapeMismatch) {
+    auto t1 = std::make_shared<tensor<float>>(std::vector<int>{3});
+    auto t2 = std::make_shared<tensor<float>>(std::vector<int>{1, 3});
+    t1->data = {1.0f, 2.0f, 3.0f};
+    t2->data = {1.0f, 2.0f, 3.0f};
+
+    // Expect the code to terminate due to the failed assertion (shape mismatch)
+    ASSERT_DEATH({
+        auto res = t1 + t2;
+    }, ".*");
+}
+
+TEST(TensorAssertionFailureTest, TensorMultiplicationShapeMismatch) {
+    auto t1 = std::make_shared<tensor<int>>(std::vector<int>{4});
+    auto t2 = std::make_shared<tensor<int>>(std::vector<int>{2});
+    t1->data = {1, 2, 3, 4};
+    t2->data = {1, 2};
+
+    // Expect the code to terminate due to the failed assertion (shape mismatch)
+    ASSERT_DEATH({
+        auto res = t1 + t2;
+    }, ".*");
+}
+
+TEST(TensorAssertionFailureTest, TensorSubtractionShapeMismatch) {
+    auto t1 = std::make_shared<tensor<int>>(std::vector<int>{5, 3});
+    auto t2 = std::make_shared<tensor<int>>(std::vector<int>{3, 5});
+    t1->data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+    t2->data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+
+    // Expect the code to terminate due to the failed assertion (shape mismatch)
+    ASSERT_DEATH({
+        auto res = t1 + t2;
+    }, ".*");
+}
+
+
+
+// Main function for GoogleTest
+int main(int argc, char **argv)
 {
-    if (test1())
-    {
-        std::cout << "Test 1 passed" << std::endl;
-    }
-    else
-    {
-        std::cout << "Test 1 failed" << std::endl;
-        return 1;
-    }
-
-    if (test2())
-    {
-        std::cout << "Test 2 passed" << std::endl;
-    }
-    else
-    {
-        std::cout << "Test 2 failed" << std::endl;
-        return 1;
-    }
-
-    if (test3())
-    {
-        std::cout << "Test 3 passed" << std::endl;
-    }
-    else
-    {
-        std::cout << "Test 3 failed" << std::endl;
-        return 1;
-    }
-
-    if (test4())
-    {
-        std::cout << "Test 4 passed" << std::endl;
-    }
-    else
-    {
-        std::cout << "Test 4 failed" << std::endl;
-        return 1;
-    }
-    return 0;
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

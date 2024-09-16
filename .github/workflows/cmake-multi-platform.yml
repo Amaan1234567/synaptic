@@ -16,20 +16,16 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         build_type: [Release]
         c_compiler: [gcc, clang, cl]
-        cpp_compiler: [g++, clang++, cl]
         include:
           - os: windows-latest
             c_compiler: cl
             cpp_compiler: cl
-            generator: 'Visual Studio 17 2022'
           - os: ubuntu-latest
             c_compiler: gcc
             cpp_compiler: g++
-            generator: 'Ninja'
           - os: ubuntu-latest
             c_compiler: clang
             cpp_compiler: clang++
-            generator: 'Ninja'
         exclude:
           - os: windows-latest
             c_compiler: gcc
@@ -41,27 +37,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install Dependencies
-      if: runner.os == 'Linux'
-      run: sudo apt-get install -y ninja-build
-
-    - name: Install Dependencies
-      if: runner.os == 'Windows'
-      run: choco install ninja
-
     - name: Set reusable strings
       id: strings
       shell: bash
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
-      if: runner.os == 'Linux'
-      
-    - name: Set reusable strings
-      id: strings_for_windows
-      shell: bash
-      run: |
-        echo "build-output-dir=${{ github.workspace }}\\build" >> "$GITHUB_OUTPUT"
-      if: runner.os == 'Windows'
 
     - name: Configure CMake
       run: >
@@ -69,16 +49,10 @@ jobs:
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -G "${{ matrix.generator }}"
         -S ${{ github.workspace }}
 
     - name: Build
-      if: runner.os == 'Linux'
-      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }} -- -j $(nproc)
-
-    - name: Build
-      if: runner.os == 'Windows'
-      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }} -- /p:Configuration=${{ matrix.build_type }} /p:Platform=x64
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }} -- -j $(nproc) 
 
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}

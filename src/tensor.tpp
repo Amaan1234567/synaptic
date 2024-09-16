@@ -7,7 +7,7 @@
 #include <limits>
 #include <cmath>
 #include "../include/op_enum.hpp"
-//#include "../include/tensor.hpp"
+#include "../include/tensor.hpp"
 
 
 template <typename T>

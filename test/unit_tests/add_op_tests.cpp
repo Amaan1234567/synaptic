@@ -105,4 +105,3 @@ TEST(TensorAssertionFailureTest, TensorAdditionWithScalarShapeMismatch) {
         auto res = t1 + t2;
     },std::runtime_error);
 }
-

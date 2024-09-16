@@ -9,7 +9,6 @@
 #include "../include/op_enum.hpp"
 #include "../include/tensor.hpp"
 
-
 template <typename T>
 std::ostream &operator<<(std::ostream &output, const tensor<T> &t)
 {
@@ -25,7 +24,6 @@ std::ostream &operator<<(std::ostream &output, const tensor<T> &t)
     }
     return output;
 }
-
 
 template <typename T>
 void tensor<T>::add_backprop(std::shared_ptr<tensor<T>> &a, std::shared_ptr<tensor<T>> &b, const tensor<T> &output)
@@ -61,8 +59,20 @@ void tensor<T>::div_backprop(std::shared_ptr<tensor<T>> &a, std::shared_ptr<tens
 {
     for (int i = 0; i < output.grad.size(); ++i)
     {
-        a->grad[i] += T(1)/b->data[i] * output.grad[i];
-        b->grad[i] += (-(a->data[i])/std::pow(b->data[i],2)) * output.grad[i];
+        a->grad[i] += T(1) / b->data[i] * output.grad[i];
+        b->grad[i] += (-(a->data[i]) / std::pow(b->data[i], 2)) * output.grad[i];
+    }
+}
+
+template <typename T>
+void tensor<T>::pow_backprop(std::shared_ptr<tensor<T>> &a, std::shared_ptr<tensor<T>> &pow_tensor, const tensor &output)
+{
+    float pow = pow_tensor->data[0];
+    auto a_raised_to_pow_minus_one = tensor<T>::pow(a,pow-1);
+    std::cout<<"a^pow-1:\n"<<*a_raised_to_pow_minus_one<<std::endl;
+    for (int i = 0; i < output.grad.size(); ++i)
+    {
+        a->grad[i] += pow * a_raised_to_pow_minus_one->data[i] * output.grad[i];
     }
 }
 
@@ -79,16 +89,17 @@ void tensor<T>::matmul_backprop(std::shared_ptr<tensor<T>> &a, std::shared_ptr<t
     b->grad = res2->data;
 }
 template <typename T>
-bool tensor<T>::dim_check(std::shared_ptr<tensor<T>> a,std::shared_ptr<tensor<T>> b)
+bool tensor<T>::dim_check(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b)
 {
-    if (a->dims.size() != b->dims.size()) {
-            throw std::runtime_error("Number of Dimensions of tensors being added should be the same");
+    if (a->dims.size() != b->dims.size())
+    {
+        throw std::runtime_error("Number of Dimensions of tensors being added should be the same");
     }
     return true;
 }
 
 template <typename T>
-bool tensor<T>::shape_check(std::shared_ptr<tensor<T>> a,std::shared_ptr<tensor<T>> b)
+bool tensor<T>::shape_check(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b)
 {
     bool shape_flag = true;
     for (int i = 0; i < a->dims.size(); ++i)
@@ -99,24 +110,25 @@ bool tensor<T>::shape_check(std::shared_ptr<tensor<T>> a,std::shared_ptr<tensor<
             break;
         }
     }
-    if (!shape_flag) {
-            throw std::runtime_error("Shape mismatch during addition");
+    if (!shape_flag)
+    {
+        throw std::runtime_error("Shape mismatch during addition");
     }
     return shape_flag;
 }
 
 template <typename T>
-void tensor<T>::common_tensor_compatibility_tests(std::shared_ptr<tensor<T>> a,std::shared_ptr<tensor<T>> b)
+void tensor<T>::common_tensor_compatibility_tests(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b)
 {
-    tensor<T>::dim_check(a,b);
-    tensor<T>::shape_check(a,b);
+    tensor<T>::dim_check(a, b);
+    tensor<T>::shape_check(a, b);
 }
 
 template <typename T>
 std::shared_ptr<tensor<T>> tensor<T>::add(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b)
 {
-    
-    tensor<T>::common_tensor_compatibility_tests(a,b);
+
+    tensor<T>::common_tensor_compatibility_tests(a, b);
     auto output = std::make_shared<tensor>(a->dims);
     output->operation = op::add;
     output->previous_nodes.push_back(a);
@@ -127,10 +139,27 @@ std::shared_ptr<tensor<T>> tensor<T>::add(std::shared_ptr<tensor<T>> a, std::sha
     }
     return output;
 }
+
+template <typename T>
+std::shared_ptr<tensor<T>> tensor<T>::sub(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b)
+{
+    tensor<T>::common_tensor_compatibility_tests(a, b);
+
+    auto output = std::make_shared<tensor>(a->dims);
+    output->operation = op::sub;
+    output->previous_nodes.push_back(a);
+    output->previous_nodes.push_back(b);
+    for (int i = 0; i < a->data.size(); ++i)
+    {
+        output->data[i] = a->data[i] - b->data[i];
+    }
+    return output;
+}
+
 template <typename T>
 std::shared_ptr<tensor<T>> tensor<T>::mul(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b)
 {
-    tensor<T>::common_tensor_compatibility_tests(a,b);
+    tensor<T>::common_tensor_compatibility_tests(a, b);
 
     auto output = std::make_shared<tensor>(a->dims);
     output->operation = op::mul;
@@ -146,7 +175,7 @@ std::shared_ptr<tensor<T>> tensor<T>::mul(std::shared_ptr<tensor<T>> a, std::sha
 template <typename T>
 std::shared_ptr<tensor<T>> tensor<T>::div(std::shared_ptr<tensor> a, std::shared_ptr<tensor> b)
 {
-    tensor<T>::common_tensor_compatibility_tests(a,b);
+    tensor<T>::common_tensor_compatibility_tests(a, b);
 
     auto output = std::make_shared<tensor>(a->dims);
     output->operation = op::divi;
@@ -154,32 +183,33 @@ std::shared_ptr<tensor<T>> tensor<T>::div(std::shared_ptr<tensor> a, std::shared
     output->previous_nodes.push_back(b);
     for (int i = 0; i < a->data.size(); ++i)
     {
-        if(b->data[i]==T(0))
-        output->data[i]=std::numeric_limits<T>::infinity();
+        if (b->data[i] == T(0))
+            output->data[i] = std::numeric_limits<T>::infinity();
         else
-        output->data[i] = a->data[i] / b->data[i];
+            output->data[i] = a->data[i] / b->data[i];
     }
-    //std::cout << *output << std::endl;
+    // std::cout << *output << std::endl;
     return output;
 }
 
 template <typename T>
-std::shared_ptr<tensor<T>> tensor<T>::sub(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b)
+std::shared_ptr<tensor<T>> tensor<T>::pow(std::shared_ptr<tensor> a, float pow)
 {
-    tensor<T>::common_tensor_compatibility_tests(a,b);
-
+    auto pow_tensor = std::make_shared<tensor<float>>(std::vector<int>{1});
+    pow_tensor->data[0]=pow;
     auto output = std::make_shared<tensor>(a->dims);
-    output->operation = op::sub;
+    output->operation = op::pow;
     output->previous_nodes.push_back(a);
-    output->previous_nodes.push_back(b);
+    output->previous_nodes.push_back(pow_tensor);
     for (int i = 0; i < a->data.size(); ++i)
     {
-        output->data[i] = a->data[i] - b->data[i];
+        if (a->data[i] == T(0) && pow<=T(-1))
+            output->data[i] = std::numeric_limits<T>::infinity();
+        else
+            output->data[i] = std::pow(a->data[i],pow);
     }
     return output;
 }
-
-
 
 template <typename T>
 void tensor<T>::matmul_general_impl(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b, std::shared_ptr<tensor<T>> output, std::vector<int> &custom_dims_a, std::vector<int> &custom_dims_b)
@@ -206,13 +236,13 @@ void tensor<T>::matmul_general_impl(std::shared_ptr<tensor<T>> a, std::shared_pt
 template <typename T>
 std::shared_ptr<tensor<T>> tensor<T>::matmul(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b)
 {
-    tensor<T>::dim_check(a,b);
+    tensor<T>::dim_check(a, b);
     bool matmul_flag = true;
     auto last_dim = a->dims.size() - 1;
     if (a->dims[last_dim] != b->dims[last_dim - 1])
         matmul_flag = false;
 
-    if(!matmul_flag)
+    if (!matmul_flag)
     {
         std::runtime_error("Tensors not compatible for matrix multiplication please check shapes");
     }
@@ -231,7 +261,7 @@ std::shared_ptr<tensor<T>> tensor<T>::matmul(std::shared_ptr<tensor<T>> a, std::
         total1 *= a->dims[i];
         total2 *= b->dims[i];
     }
-    if(total1 == total2)
+    if (total1 == total2)
     {
         std::runtime_error("Tensors are do not have same shape");
     }
@@ -258,7 +288,7 @@ std::shared_ptr<tensor<T>> tensor<T>::matmul(std::shared_ptr<tensor<T>> a, std::
 template <typename T>
 std::shared_ptr<tensor<T>> tensor<T>::transpose(std::shared_ptr<tensor<T>> a, int dim0, int dim1)
 {
-    if(dim0 >= 0 && dim0 < a->dims.size() && dim1 >= 0 && dim1 < a->dims.size() && dim0 != dim1)
+    if (dim0 >= 0 && dim0 < a->dims.size() && dim1 >= 0 && dim1 < a->dims.size() && dim0 != dim1)
     {
         std::runtime_error("Please provide proper dimension indices, and make sure both the indices are different :)");
     }
@@ -329,6 +359,10 @@ void tensor<T>::recursive_backprop(std::shared_ptr<tensor<T>> cur)
     {
         div_backprop(cur->previous_nodes[0], cur->previous_nodes[1], *cur);
     }
+    else if (cur->operation == op::pow)
+    {
+        pow_backprop(cur->previous_nodes[0], cur->previous_nodes[1], *cur);
+    }
     else if (cur->operation == op::matmul)
     {
         matmul_backprop(cur->previous_nodes[0], cur->previous_nodes[1], *cur);
@@ -391,7 +425,7 @@ std::shared_ptr<tensor<T>> operator*(T a, std::shared_ptr<tensor<T>> b)
 {
     auto tensorised_scalar = std::make_shared<tensor<T>>(b->dims);
     tensorised_scalar->data = std::vector<T>(tensorised_scalar->total, a);
-    return tensor<T>::mul(tensorised_scalar,b);
+    return tensor<T>::mul(tensorised_scalar, b);
 }
 
 template <typename T>
@@ -413,7 +447,7 @@ std::shared_ptr<tensor<T>> operator/(T a, std::shared_ptr<tensor<T>> b)
 {
     auto tensorised_scalar = std::make_shared<tensor<T>>(b->dims);
     tensorised_scalar->data = std::vector<T>(tensorised_scalar->total, a);
-    return tensor<T>::div(tensorised_scalar,b);
+    return tensor<T>::div(tensorised_scalar, b);
 }
 
 template <typename T>

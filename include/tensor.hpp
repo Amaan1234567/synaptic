@@ -39,6 +39,7 @@ public:
     static void sub_backprop(std::shared_ptr<tensor> &a, std::shared_ptr<tensor> &b, const tensor &output);
     static void mul_backprop(std::shared_ptr<tensor> &a, std::shared_ptr<tensor> &b, const tensor &output);
     static void div_backprop(std::shared_ptr<tensor> &a, std::shared_ptr<tensor> &b, const tensor &output);
+    static void pow_backprop(std::shared_ptr<tensor> &a, std::shared_ptr<tensor> &b, const tensor &output);
     static void matmul_backprop(std::shared_ptr<tensor> &a, std::shared_ptr<tensor> &b, const tensor &output);
     static void matmul_general_impl(std::shared_ptr<tensor<type>> a, std::shared_ptr<tensor<type>> b, std::shared_ptr<tensor<type>> output, std::vector<int> &custom_dims_a, std::vector<int> &custom_dims_b);
     static bool dim_check(std::shared_ptr<tensor> a,std::shared_ptr<tensor> b);
@@ -48,6 +49,7 @@ public:
     static std::shared_ptr<tensor> sub(std::shared_ptr<tensor> a, std::shared_ptr<tensor> b);
     static std::shared_ptr<tensor> mul(std::shared_ptr<tensor> a, std::shared_ptr<tensor> b);
     static std::shared_ptr<tensor> div(std::shared_ptr<tensor> a, std::shared_ptr<tensor> b);
+    static std::shared_ptr<tensor> pow(std::shared_ptr<tensor> a, float pow);
     static std::shared_ptr<tensor> matmul(std::shared_ptr<tensor> a, std::shared_ptr<tensor> b);
     static std::shared_ptr<tensor> transpose(std::shared_ptr<tensor> a, int dim0, int dim1);
     static void recursive_backprop(std::shared_ptr<tensor> cur);

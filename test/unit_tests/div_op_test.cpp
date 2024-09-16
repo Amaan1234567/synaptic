@@ -90,7 +90,6 @@ TEST(TensorTest, ScalarDivisionToTensor)
     t4->data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30};
 
     auto res = 1.0f / t4;
-    std::cout << *res <<std::endl;
     std::vector<float> expected = {1.0000, 0.5000, 0.3333, 0.2500, 0.2000, 0.1667, 0.1429, 0.1250, 0.1111,
         0.1000, 0.0909, 0.0833, 0.0769, 0.0714, 0.0667, 0.0625, 0.0588, 0.0556,
         0.0526, 0.0500, 0.0476, 0.0455, 0.0435, 0.0417, 0.0400, 0.0385, 0.0370,
@@ -142,6 +141,3 @@ TEST(TensorAssertionFailureTest, TensorDivisionWithScalarShapeMismatch) {
         auto res = t1 / t2;
     },std::runtime_error);
 }
-
-
-

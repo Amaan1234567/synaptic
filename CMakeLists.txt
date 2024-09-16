@@ -11,7 +11,7 @@ include_directories(${CMAKE_SOURCE_DIR}/test/)
 
 # Source files
 file(GLOB SOURCES "src/*.cpp")
-file(GLOB test_sources "test/unit_tests/add_op_tests.cpp")
+file(GLOB test_sources "test/unit_tests/*.cpp")
 file(GLOB MAIN "src/engine.cpp")
 
 # Enable testing
@@ -19,7 +19,7 @@ enable_testing()
 
 # Executables
 add_executable(executable ${MAIN})
-add_executable(test1 ${test_sources})
+add_executable(tests ${test_sources})
 
 # GoogleTest integration
 include(FetchContent)
@@ -34,7 +34,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 # Link gtest and gtest_main libraries to test1
-target_link_libraries(test1 gtest gtest_main)
+target_link_libraries(tests gtest gtest_main)
 
 # Register the test
-add_test(NAME basic_add_op_test COMMAND test1)
+add_test(NAME run_all_tests COMMAND tests)

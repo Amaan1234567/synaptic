@@ -16,7 +16,26 @@ TEST(TensorTest, AdditionOfTwoTensors)
     std::vector<float> expected = {2.0, 7.0};
 
     for (int i = 0; i < res->total; i++) {
-        EXPECT_FLOAT_EQ(res->data[i], expected[i]);  // Using EXPECT_FLOAT_EQ for floating point comparison
+        EXPECT_FLOAT_EQ(res->data[i], expected[i]);
+
+    }
+}
+
+TEST(TensorTest, AdditionOfTwoTensorsBackpropCheck)
+{
+    auto t1 = std::make_shared<tensor<float>>(std::vector<int>{2});
+    auto t2 = std::make_shared<tensor<float>>(std::vector<int>{2});
+    t1->data = {1.0, 3.0};
+    t2->data = {1.0, 4.0};
+
+    auto res = t1 + t2;
+    std::vector<float> expected = {1.0, 1.0};
+
+    res->backprop();
+    for (int i = 0; i < res->total; i++) {
+        EXPECT_FLOAT_EQ(t1->grad[i], expected[i]);
+        EXPECT_FLOAT_EQ(t2->grad[i], expected[i]);
+        
     }
 }
 
@@ -87,10 +106,3 @@ TEST(TensorAssertionFailureTest, TensorAdditionWithScalarShapeMismatch) {
     },std::runtime_error);
 }
 
-
-// Main function for GoogleTest
-int main(int argc, char **argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

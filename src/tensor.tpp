@@ -391,14 +391,14 @@ void tensor<T>::recursive_backprop(std::shared_ptr<tensor<T>> cur)
     }
     else if (cur->operation == op::exp)
     {
-        std::cout<<"cur operation: "<<"exp"<<std::endl;
+        //std::cout<<"cur operation: "<<"exp"<<std::endl;
         exp_backprop(cur->previous_nodes[0], *cur);
     }
     else if (cur->operation == op::matmul)
     {
         matmul_backprop(cur->previous_nodes[0], cur->previous_nodes[1], *cur);
     }
-    std::cout<<"recursing"<<std::endl;
+    //std::cout<<"recursing"<<std::endl;
     if (cur->previous_nodes.size()!=0 && cur->previous_nodes[0]->operation != op::none)
         recursive_backprop(cur->previous_nodes[0]);
 

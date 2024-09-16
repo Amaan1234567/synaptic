@@ -69,11 +69,22 @@ void tensor<T>::pow_backprop(std::shared_ptr<tensor<T>> &a, std::shared_ptr<tens
 {
     float pow = pow_tensor->data[0];
     auto a_raised_to_pow_minus_one = tensor<T>::pow(a,pow-1);
-    std::cout<<"a^pow-1:\n"<<*a_raised_to_pow_minus_one<<std::endl;
+    
     for (int i = 0; i < output.grad.size(); ++i)
     {
         a->grad[i] += pow * a_raised_to_pow_minus_one->data[i] * output.grad[i];
     }
+}
+
+template <typename T>
+void tensor<T>::exp_backprop(std::shared_ptr<tensor<T>> &a, const tensor &output)
+{
+    for (int i = 0; i < output.grad.size(); ++i)
+    {
+        a->grad[i] += output.data[i] * output.grad[i];
+    }
+    //std::cout << "inside exp_backprop" << std::endl;
+    //std::cout<< *a << std::endl;
 }
 
 template <typename T>
@@ -212,6 +223,20 @@ std::shared_ptr<tensor<T>> tensor<T>::pow(std::shared_ptr<tensor> a, float pow)
 }
 
 template <typename T>
+std::shared_ptr<tensor<T>> tensor<T>::exp(std::shared_ptr<tensor> a)
+{
+    auto pow_tensor = std::make_shared<tensor<float>>(std::vector<int>{1});
+    auto output = std::make_shared<tensor>(a->dims);
+    output->operation = op::exp;
+    output->previous_nodes.push_back(a);
+    for (int i = 0; i < a->data.size(); ++i)
+    {
+        output->data[i] = std::exp(a->data[i]);
+    }
+    return output;
+}
+
+template <typename T>
 void tensor<T>::matmul_general_impl(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b, std::shared_ptr<tensor<T>> output, std::vector<int> &custom_dims_a, std::vector<int> &custom_dims_b)
 {
     for (int batch = 0; batch < custom_dims_a[0]; batch++)
@@ -343,6 +368,7 @@ std::shared_ptr<tensor<T>> tensor<T>::transpose(std::shared_ptr<tensor<T>> a, in
 template <typename T>
 void tensor<T>::recursive_backprop(std::shared_ptr<tensor<T>> cur)
 {
+    
     if (cur->operation == op::add)
     {
         add_backprop(cur->previous_nodes[0], cur->previous_nodes[1], *cur);
@@ -363,15 +389,20 @@ void tensor<T>::recursive_backprop(std::shared_ptr<tensor<T>> cur)
     {
         pow_backprop(cur->previous_nodes[0], cur->previous_nodes[1], *cur);
     }
+    else if (cur->operation == op::exp)
+    {
+        std::cout<<"cur operation: "<<"exp"<<std::endl;
+        exp_backprop(cur->previous_nodes[0], *cur);
+    }
     else if (cur->operation == op::matmul)
     {
         matmul_backprop(cur->previous_nodes[0], cur->previous_nodes[1], *cur);
     }
-
-    if (cur->previous_nodes[0]->operation != op::none)
+    std::cout<<"recursing"<<std::endl;
+    if (cur->previous_nodes.size()!=0 && cur->previous_nodes[0]->operation != op::none)
         recursive_backprop(cur->previous_nodes[0]);
 
-    if (cur->previous_nodes[1]->operation != op::none)
+    if (cur->previous_nodes.size()!=1 && cur->previous_nodes[1]->operation != op::none)
         recursive_backprop(cur->previous_nodes[1]);
 }
 

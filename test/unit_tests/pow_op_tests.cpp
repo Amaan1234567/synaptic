@@ -57,7 +57,7 @@ TEST(TensorTest, TensorRaiseToPowBackpropCheck)
     std::vector<float> expected1 = {1.0,4.0};
     std::vector<float> expected2 = {2.0,4.0};
     res->backprop();
-    std::cout<< *t1 <<std::endl;
+    //std::cout<< *t1 <<std::endl;
     for (int i = 0; i < res->total; i++) {
         EXPECT_FLOAT_EQ(res->data[i], expected1[i]);
         EXPECT_FLOAT_EQ(t1->grad[i], expected2[i]);

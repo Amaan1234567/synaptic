@@ -29,8 +29,8 @@ TEST(TensorTest, TensorExpBackpropCheck)
     res->backprop();
     //std::cout<< *t1 <<std::endl;
 
-    /* for (int i = 0; i < res->total; i++) {
+    for (int i = 0; i < res->total; i++) {
         EXPECT_NEAR(res->data[i], expected[i],0.001);
         EXPECT_NEAR(t1->grad[i], expected[i],0.001);
-    } */
+    }
 }

@@ -350,7 +350,7 @@ std::shared_ptr<tensor<T>> tensor<T>::transpose(std::shared_ptr<tensor<T>> a, in
     std::swap(output_dims[dim0], output_dims[dim1]);
 
     auto output = std::make_shared<tensor>(output_dims);
-    auto dims_tensor = std::make_shared<tensor>(std::vector<int>{2});
+    auto dims_tensor = std::make_shared<tensor<T>>(std::vector<int>{2});
     dims_tensor->data[0]=dim0;
     dims_tensor->data[1]=dim1;
     output->previous_nodes.push_back(a);

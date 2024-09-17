@@ -1,7 +1,7 @@
 #include "../../include/tensor.hpp"
 #include <vector>
 #include <memory>
-#include <gtest/gtest.h> // Include the GoogleTest header
+#include <gtest/gtest.h> 
 #include <stdexcept>
 
 TEST(TensorTest, TensorExp)

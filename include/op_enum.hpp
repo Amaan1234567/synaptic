@@ -11,6 +11,8 @@ enum class op
     pow,
     exp,
     matmul,
+    transpose,
+    reshape,
 };
 
 #endif

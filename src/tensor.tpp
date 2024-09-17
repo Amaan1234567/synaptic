@@ -99,6 +99,33 @@ void tensor<T>::matmul_backprop(std::shared_ptr<tensor<T>> &a, std::shared_ptr<t
     a->grad = res1->data;
     b->grad = res2->data;
 }
+
+template <typename T>
+void tensor<T>::transpose_backprop(std::shared_ptr<tensor<T>> &a, std::shared_ptr<tensor<T>> &dims_tensor, std::shared_ptr<tensor<T>> &output)
+{
+    auto grad_tensor = std::make_shared<tensor>(output->dims);
+    grad_tensor->data = output->grad;
+    auto res = tensor<T>::transpose(grad_tensor,int(dims_tensor->data[1]),int(dims_tensor->data[0]));
+    for(int i=0;i<a->total;i++)
+    {
+        a->grad[i] += res->data[i]*output->grad[i];
+    }
+    std::cout << *a << std::endl;
+}
+
+template <typename T>
+void tensor<T>::reshape_backprop(std::shared_ptr<tensor<T>> &a, const tensor &output)
+{
+    auto grad_tensor = std::make_shared<tensor>(output.dims);
+    grad_tensor->data = output.grad;
+    auto res = tensor<T>::reshape(grad_tensor,a->dims);
+    for(int i=0;i<a->total;i++)
+    {
+        a->grad[i] += res->data[i]*output.grad[i];
+    }
+    std::cout << *a << std::endl;
+}
+
 template <typename T>
 bool tensor<T>::dim_check(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b)
 {
@@ -310,6 +337,7 @@ std::shared_ptr<tensor<T>> tensor<T>::matmul(std::shared_ptr<tensor<T>> a, std::
     matmul_general_impl(a, b, output, custom_dims_a, custom_dims_b);
     return output;
 }
+
 template <typename T>
 std::shared_ptr<tensor<T>> tensor<T>::transpose(std::shared_ptr<tensor<T>> a, int dim0, int dim1)
 {
@@ -322,7 +350,13 @@ std::shared_ptr<tensor<T>> tensor<T>::transpose(std::shared_ptr<tensor<T>> a, in
     std::swap(output_dims[dim0], output_dims[dim1]);
 
     auto output = std::make_shared<tensor>(output_dims);
-
+    auto dims_tensor = std::make_shared<tensor>(std::vector<int>{2});
+    dims_tensor->data[0]=dim0;
+    dims_tensor->data[1]=dim1;
+    output->previous_nodes.push_back(a);
+    output->previous_nodes.push_back(dims_tensor);
+    output->operation = op::transpose;
+    
     // Calculate original strides
     std::vector<int> strides(a->dims.size(), 1);
     for (int i = a->dims.size() - 2; i >= 0; i--)
@@ -340,15 +374,10 @@ std::shared_ptr<tensor<T>> tensor<T>::transpose(std::shared_ptr<tensor<T>> a, in
     for (int count = 0; count < total_elements; ++count)
     {
         int original_idx = 0;
-        std::cout << "counts: ";
-        for (auto ele : counts)
-            std::cout << ele << " ";
-        std::cout << std::endl;
         for (int i = 0; i < strides.size(); ++i)
         {
             original_idx += counts[i] * strides[i];
         }
-        std::cout << "idx: " << original_idx << std::endl;
         output->data[count] = a->data[original_idx];
 
         // Increment the multi-dimensional index
@@ -365,6 +394,18 @@ std::shared_ptr<tensor<T>> tensor<T>::transpose(std::shared_ptr<tensor<T>> a, in
 
     return output;
 }
+
+template <typename T>
+std::shared_ptr<tensor<T>> tensor<T>::reshape(std::shared_ptr<tensor<T>> a, std::vector<int> new_shape)
+{
+    auto output = std::make_shared<tensor<T>>(new_shape);
+    output->data = a->data;
+    output->operation = op::reshape;
+    output->previous_nodes.push_back(a);
+
+    return output;
+}
+
 template <typename T>
 void tensor<T>::recursive_backprop(std::shared_ptr<tensor<T>> cur)
 {
@@ -397,6 +438,14 @@ void tensor<T>::recursive_backprop(std::shared_ptr<tensor<T>> cur)
     else if (cur->operation == op::matmul)
     {
         matmul_backprop(cur->previous_nodes[0], cur->previous_nodes[1], *cur);
+    }
+    else if (cur->operation == op::transpose)
+    {
+        transpose_backprop(cur->previous_nodes[0], cur->previous_nodes[1], cur);
+    }
+    else if (cur->operation == op::reshape)
+    {
+        reshape_backprop(cur->previous_nodes[0],*cur);
     }
     //std::cout<<"recursing"<<std::endl;
     if (cur->previous_nodes.size()!=0 && cur->previous_nodes[0]->operation != op::none)

@@ -1,9 +1,10 @@
-#include "../../include/tensor.hpp"
+#include "../../include/synaptic.hpp"
 #include <vector>
 #include <memory>
 #include <gtest/gtest.h> // Include the GoogleTest header
 #include <stdexcept>
 
+using namespace synaptic;
 // Test case 1
 TEST(TensorTest, AdditionOfTwoTensors)
 {

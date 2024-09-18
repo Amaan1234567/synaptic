@@ -13,6 +13,7 @@ enum class op
     matmul,
     transpose,
     reshape,
+    relu,
 };
 
 #endif

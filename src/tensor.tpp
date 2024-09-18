@@ -9,6 +9,8 @@
 #include "../include/op_enum.hpp"
 #include "../include/tensor.hpp"
 
+using namespace synaptic;
+
 template <typename T>
 std::ostream &operator<<(std::ostream &output, const tensor<T> &t)
 {
@@ -110,7 +112,6 @@ void tensor<T>::transpose_backprop(std::shared_ptr<tensor<T>> &a, std::shared_pt
     {
         a->grad[i] += res->data[i]*output->grad[i];
     }
-    std::cout << *a << std::endl;
 }
 
 template <typename T>
@@ -123,7 +124,6 @@ void tensor<T>::reshape_backprop(std::shared_ptr<tensor<T>> &a, const tensor &ou
     {
         a->grad[i] += res->data[i]*output.grad[i];
     }
-    std::cout << *a << std::endl;
 }
 
 template <typename T>

@@ -1,8 +1,10 @@
-#include "../../include/tensor.hpp"
+#include "../../include/synaptic.hpp"
 #include <vector>
 #include <memory>
 #include <gtest/gtest.h>
 #include <stdexcept>
+
+using namespace synaptic;
 
 TEST(TensorTest, MultiplicationOfTwoTensors)
 {

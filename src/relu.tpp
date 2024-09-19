@@ -28,6 +28,6 @@ void synaptic::connections::relu<type>::backward(std::shared_ptr<synaptic::tenso
             : synaptic::connections::relu<type>::below_thres_value;
 
         input_tensor->grad[i] += grad_multiplier * output_tensor->grad[i];
-        std::cout<< *input_tensor <<std::endl;
+        //std::cout<< *input_tensor <<std::endl;
     }
 }

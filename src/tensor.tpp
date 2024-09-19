@@ -278,10 +278,10 @@ void synaptic::tensor<T>::matmul_general_impl(std::shared_ptr<synaptic::tensor<T
                     int a_idx = batch * (custom_dims_a[1] * custom_dims_a[2]) + i * custom_dims_a[2] + k;
                     int b_idx = batch * (custom_dims_b[1] * custom_dims_b[2]) + k * custom_dims_b[2] + j;
                     output->data[output_idx] += a->data[a_idx] * b->data[b_idx];
-                    std::cout << output_idx << " " << a_idx << " " << b_idx << std::endl;
+                    //std::cout << output_idx << " " << a_idx << " " << b_idx << std::endl;
                 }
             }
-            std::cout << std::endl;
+            //std::cout << std::endl;
         }
     }
 }
@@ -291,13 +291,9 @@ std::shared_ptr<synaptic::tensor<T>> synaptic::tensor<T>::matmul(std::shared_ptr
     synaptic::tensor<T>::dim_check(a, b);
     bool matmul_flag = true;
     auto last_dim = a->dims.size() - 1;
+    std::cout << a->dims[last_dim] << " " << b->dims[last_dim - 1] << std::endl;
     if (a->dims[last_dim] != b->dims[last_dim - 1])
-        matmul_flag = false;
-
-    if (!matmul_flag)
-    {
-        std::runtime_error("Tensors not compatible for matrix multiplication please check shapes");
-    }
+    throw std::runtime_error("Tensors not compatible for matrix multiplication please check shapes");
 
     std::vector<int> custom_dims_a(3, 0);
     std::vector<int> custom_dims_b(3, 0);

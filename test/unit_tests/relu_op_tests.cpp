@@ -26,7 +26,7 @@ TEST(TensorTest, TensorReluBackpropCheck)
 
     synaptic::connections::relu<float> relu = synaptic::connections::relu<float>();
     auto res = relu.forward(t4);
-    std::cout << *res << std::endl;
+    //std::cout << *res << std::endl;
     std::vector<float> expected = std::vector<float>{1.0,0.0,1.0,1.0};
 
     res->backprop();

@@ -7,8 +7,7 @@
 
 namespace synaptic
 {
-
-
+    
 } // namespace synaptic
 
 #endif // SYNAPTIC_HPP

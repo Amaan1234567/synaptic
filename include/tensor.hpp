@@ -34,9 +34,7 @@ namespace synaptic
             grad.resize(total, 0);
             dims = shape;
         }
-        template <typename T>
-        friend std::ostream &operator<<(std::ostream &output, const tensor<T> &t);
-
+        
         static void add_backprop(std::shared_ptr<tensor> &a, std::shared_ptr<tensor> &b, const tensor &output);
         static void sub_backprop(std::shared_ptr<tensor> &a, std::shared_ptr<tensor> &b, const tensor &output);
         static void mul_backprop(std::shared_ptr<tensor> &a, std::shared_ptr<tensor> &b, const tensor &output);
@@ -69,6 +67,8 @@ namespace synaptic
 }
 
 // Overloaded operators for tensor
+template <typename type>
+std::ostream &operator<<(std::ostream &output, const synaptic::tensor<type> &t);
 
 template <typename type>
 std::shared_ptr<synaptic::tensor<type>> operator+(std::shared_ptr<synaptic::tensor<type>> a, std::shared_ptr<synaptic::tensor<type>> b);

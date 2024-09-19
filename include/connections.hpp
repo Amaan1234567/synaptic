@@ -3,9 +3,11 @@
 
 #include "relu.hpp"
 
-namespace connections
+namespace synaptic
 {
-
+    namespace connections
+    {
+        // You can declare other connection types or functions related to synaptic::connections here.
+    }
 }
-
 #endif

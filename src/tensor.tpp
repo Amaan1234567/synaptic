@@ -7,12 +7,12 @@
 #include <limits>
 #include <cmath>
 #include "../include/op_enum.hpp"
-#include "../include/tensor.hpp"
+#include "../include/synaptic.hpp"
+#include "../include/connections.hpp"
 
-using namespace synaptic;
 
 template <typename T>
-std::ostream &operator<<(std::ostream &output, const tensor<T> &t)
+std::ostream &operator<<(std::ostream &output, const synaptic::tensor<T> &t)
 {
     output << "Tensor:\nData: \n";
     for (const auto &ele : t.data)
@@ -28,7 +28,7 @@ std::ostream &operator<<(std::ostream &output, const tensor<T> &t)
 }
 
 template <typename T>
-void tensor<T>::add_backprop(std::shared_ptr<tensor<T>> &a, std::shared_ptr<tensor<T>> &b, const tensor<T> &output)
+void synaptic::tensor<T>::add_backprop(std::shared_ptr<synaptic::tensor<T>> &a, std::shared_ptr<synaptic::tensor<T>> &b, const synaptic::tensor<T> &output)
 {
     for (int i = 0; i < output.grad.size(); ++i)
     {
@@ -37,7 +37,7 @@ void tensor<T>::add_backprop(std::shared_ptr<tensor<T>> &a, std::shared_ptr<tens
     }
 }
 template <typename T>
-void tensor<T>::sub_backprop(std::shared_ptr<tensor<T>> &a, std::shared_ptr<tensor<T>> &b, const tensor &output)
+void synaptic::tensor<T>::sub_backprop(std::shared_ptr<synaptic::tensor<T>> &a, std::shared_ptr<synaptic::tensor<T>> &b, const tensor &output)
 {
     for (int i = 0; i < output.grad.size(); ++i)
     {
@@ -47,7 +47,7 @@ void tensor<T>::sub_backprop(std::shared_ptr<tensor<T>> &a, std::shared_ptr<tens
 }
 
 template <typename T>
-void tensor<T>::mul_backprop(std::shared_ptr<tensor<T>> &a, std::shared_ptr<tensor<T>> &b, const tensor &output)
+void synaptic::tensor<T>::mul_backprop(std::shared_ptr<synaptic::tensor<T>> &a, std::shared_ptr<synaptic::tensor<T>> &b, const tensor &output)
 {
     for (int i = 0; i < output.grad.size(); ++i)
     {
@@ -57,7 +57,7 @@ void tensor<T>::mul_backprop(std::shared_ptr<tensor<T>> &a, std::shared_ptr<tens
 }
 
 template <typename T>
-void tensor<T>::div_backprop(std::shared_ptr<tensor<T>> &a, std::shared_ptr<tensor<T>> &b, const tensor &output)
+void synaptic::tensor<T>::div_backprop(std::shared_ptr<synaptic::tensor<T>> &a, std::shared_ptr<synaptic::tensor<T>> &b, const tensor &output)
 {
     for (int i = 0; i < output.grad.size(); ++i)
     {
@@ -67,10 +67,10 @@ void tensor<T>::div_backprop(std::shared_ptr<tensor<T>> &a, std::shared_ptr<tens
 }
 
 template <typename T>
-void tensor<T>::pow_backprop(std::shared_ptr<tensor<T>> &a, std::shared_ptr<tensor<T>> &pow_tensor, const tensor &output)
+void synaptic::tensor<T>::pow_backprop(std::shared_ptr<synaptic::tensor<T>> &a, std::shared_ptr<synaptic::tensor<T>> &pow_tensor, const tensor &output)
 {
     float pow = pow_tensor->data[0];
-    auto a_raised_to_pow_minus_one = tensor<T>::pow(a,pow-1);
+    auto a_raised_to_pow_minus_one = synaptic::tensor<T>::pow(a,pow-1);
     
     for (int i = 0; i < output.grad.size(); ++i)
     {
@@ -79,7 +79,7 @@ void tensor<T>::pow_backprop(std::shared_ptr<tensor<T>> &a, std::shared_ptr<tens
 }
 
 template <typename T>
-void tensor<T>::exp_backprop(std::shared_ptr<tensor<T>> &a, const tensor &output)
+void synaptic::tensor<T>::exp_backprop(std::shared_ptr<synaptic::tensor<T>> &a, const tensor &output)
 {
     for (int i = 0; i < output.grad.size(); ++i)
     {
@@ -90,24 +90,24 @@ void tensor<T>::exp_backprop(std::shared_ptr<tensor<T>> &a, const tensor &output
 }
 
 template <typename T>
-void tensor<T>::matmul_backprop(std::shared_ptr<tensor<T>> &a, std::shared_ptr<tensor<T>> &b, const tensor &output)
+void synaptic::tensor<T>::matmul_backprop(std::shared_ptr<synaptic::tensor<T>> &a, std::shared_ptr<synaptic::tensor<T>> &b, const tensor &output)
 {
     auto grad = std::make_shared<tensor>(output.dims);
     grad->data = output.grad;
 
-    auto res1 = tensor<T>::matmul(grad, tensor<T>::transpose(b, b->dims.size() - 1, b->dims.size() - 2));
-    auto res2 = tensor<T>::matmul(tensor<T>::transpose(a, a->dims.size() - 1, a->dims.size() - 2), grad);
+    auto res1 = synaptic::tensor<T>::matmul(grad, synaptic::tensor<T>::transpose(b, b->dims.size() - 1, b->dims.size() - 2));
+    auto res2 = synaptic::tensor<T>::matmul(synaptic::tensor<T>::transpose(a, a->dims.size() - 1, a->dims.size() - 2), grad);
 
     a->grad = res1->data;
     b->grad = res2->data;
 }
 
 template <typename T>
-void tensor<T>::transpose_backprop(std::shared_ptr<tensor<T>> &a, std::shared_ptr<tensor<T>> &dims_tensor, std::shared_ptr<tensor<T>> &output)
+void synaptic::tensor<T>::transpose_backprop(std::shared_ptr<synaptic::tensor<T>> &a, std::shared_ptr<synaptic::tensor<T>> &dims_tensor, std::shared_ptr<synaptic::tensor<T>> &output)
 {
     auto grad_tensor = std::make_shared<tensor>(output->dims);
     grad_tensor->data = output->grad;
-    auto res = tensor<T>::transpose(grad_tensor,int(dims_tensor->data[1]),int(dims_tensor->data[0]));
+    auto res = synaptic::tensor<T>::transpose(grad_tensor,int(dims_tensor->data[1]),int(dims_tensor->data[0]));
     for(int i=0;i<a->total;i++)
     {
         a->grad[i] += res->data[i]*output->grad[i];
@@ -115,11 +115,11 @@ void tensor<T>::transpose_backprop(std::shared_ptr<tensor<T>> &a, std::shared_pt
 }
 
 template <typename T>
-void tensor<T>::reshape_backprop(std::shared_ptr<tensor<T>> &a, const tensor &output)
+void synaptic::tensor<T>::reshape_backprop(std::shared_ptr<synaptic::tensor<T>> &a, const tensor &output)
 {
     auto grad_tensor = std::make_shared<tensor>(output.dims);
     grad_tensor->data = output.grad;
-    auto res = tensor<T>::reshape(grad_tensor,a->dims);
+    auto res = synaptic::tensor<T>::reshape(grad_tensor,a->dims);
     for(int i=0;i<a->total;i++)
     {
         a->grad[i] += res->data[i]*output.grad[i];
@@ -127,7 +127,7 @@ void tensor<T>::reshape_backprop(std::shared_ptr<tensor<T>> &a, const tensor &ou
 }
 
 template <typename T>
-bool tensor<T>::dim_check(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b)
+bool synaptic::tensor<T>::dim_check(std::shared_ptr<synaptic::tensor<T>> a, std::shared_ptr<synaptic::tensor<T>> b)
 {
     if (a->dims.size() != b->dims.size())
     {
@@ -137,7 +137,7 @@ bool tensor<T>::dim_check(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T
 }
 
 template <typename T>
-bool tensor<T>::shape_check(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b)
+bool synaptic::tensor<T>::shape_check(std::shared_ptr<synaptic::tensor<T>> a, std::shared_ptr<synaptic::tensor<T>> b)
 {
     bool shape_flag = true;
     for (int i = 0; i < a->dims.size(); ++i)
@@ -156,17 +156,17 @@ bool tensor<T>::shape_check(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor
 }
 
 template <typename T>
-void tensor<T>::common_tensor_compatibility_tests(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b)
+void synaptic::tensor<T>::common_tensor_compatibility_tests(std::shared_ptr<synaptic::tensor<T>> a, std::shared_ptr<synaptic::tensor<T>> b)
 {
-    tensor<T>::dim_check(a, b);
-    tensor<T>::shape_check(a, b);
+    synaptic::tensor<T>::dim_check(a, b);
+    synaptic::tensor<T>::shape_check(a, b);
 }
 
 template <typename T>
-std::shared_ptr<tensor<T>> tensor<T>::add(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b)
+std::shared_ptr<synaptic::tensor<T>> synaptic::tensor<T>::add(std::shared_ptr<synaptic::tensor<T>> a, std::shared_ptr<synaptic::tensor<T>> b)
 {
 
-    tensor<T>::common_tensor_compatibility_tests(a, b);
+    synaptic::tensor<T>::common_tensor_compatibility_tests(a, b);
     auto output = std::make_shared<tensor>(a->dims);
     output->operation = op::add;
     output->previous_nodes.push_back(a);
@@ -179,9 +179,9 @@ std::shared_ptr<tensor<T>> tensor<T>::add(std::shared_ptr<tensor<T>> a, std::sha
 }
 
 template <typename T>
-std::shared_ptr<tensor<T>> tensor<T>::sub(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b)
+std::shared_ptr<synaptic::tensor<T>> synaptic::tensor<T>::sub(std::shared_ptr<synaptic::tensor<T>> a, std::shared_ptr<synaptic::tensor<T>> b)
 {
-    tensor<T>::common_tensor_compatibility_tests(a, b);
+    synaptic::tensor<T>::common_tensor_compatibility_tests(a, b);
 
     auto output = std::make_shared<tensor>(a->dims);
     output->operation = op::sub;
@@ -195,9 +195,9 @@ std::shared_ptr<tensor<T>> tensor<T>::sub(std::shared_ptr<tensor<T>> a, std::sha
 }
 
 template <typename T>
-std::shared_ptr<tensor<T>> tensor<T>::mul(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b)
+std::shared_ptr<synaptic::tensor<T>> synaptic::tensor<T>::mul(std::shared_ptr<synaptic::tensor<T>> a, std::shared_ptr<synaptic::tensor<T>> b)
 {
-    tensor<T>::common_tensor_compatibility_tests(a, b);
+    synaptic::tensor<T>::common_tensor_compatibility_tests(a, b);
 
     auto output = std::make_shared<tensor>(a->dims);
     output->operation = op::mul;
@@ -211,9 +211,9 @@ std::shared_ptr<tensor<T>> tensor<T>::mul(std::shared_ptr<tensor<T>> a, std::sha
 }
 
 template <typename T>
-std::shared_ptr<tensor<T>> tensor<T>::div(std::shared_ptr<tensor> a, std::shared_ptr<tensor> b)
+std::shared_ptr<synaptic::tensor<T>> synaptic::tensor<T>::div(std::shared_ptr<tensor> a, std::shared_ptr<tensor> b)
 {
-    tensor<T>::common_tensor_compatibility_tests(a, b);
+    synaptic::tensor<T>::common_tensor_compatibility_tests(a, b);
 
     auto output = std::make_shared<tensor>(a->dims);
     output->operation = op::divi;
@@ -231,7 +231,7 @@ std::shared_ptr<tensor<T>> tensor<T>::div(std::shared_ptr<tensor> a, std::shared
 }
 
 template <typename T>
-std::shared_ptr<tensor<T>> tensor<T>::pow(std::shared_ptr<tensor> a, float pow)
+std::shared_ptr<synaptic::tensor<T>> synaptic::tensor<T>::pow(std::shared_ptr<tensor> a, float pow)
 {
     auto pow_tensor = std::make_shared<tensor<float>>(std::vector<int>{1});
     pow_tensor->data[0]=pow;
@@ -250,7 +250,7 @@ std::shared_ptr<tensor<T>> tensor<T>::pow(std::shared_ptr<tensor> a, float pow)
 }
 
 template <typename T>
-std::shared_ptr<tensor<T>> tensor<T>::exp(std::shared_ptr<tensor> a)
+std::shared_ptr<synaptic::tensor<T>> synaptic::tensor<T>::exp(std::shared_ptr<tensor> a)
 {
     auto pow_tensor = std::make_shared<tensor<float>>(std::vector<int>{1});
     auto output = std::make_shared<tensor>(a->dims);
@@ -264,7 +264,7 @@ std::shared_ptr<tensor<T>> tensor<T>::exp(std::shared_ptr<tensor> a)
 }
 
 template <typename T>
-void tensor<T>::matmul_general_impl(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b, std::shared_ptr<tensor<T>> output, std::vector<int> &custom_dims_a, std::vector<int> &custom_dims_b)
+void synaptic::tensor<T>::matmul_general_impl(std::shared_ptr<synaptic::tensor<T>> a, std::shared_ptr<synaptic::tensor<T>> b, std::shared_ptr<synaptic::tensor<T>> output, std::vector<int> &custom_dims_a, std::vector<int> &custom_dims_b)
 {
     for (int batch = 0; batch < custom_dims_a[0]; batch++)
     {
@@ -286,9 +286,9 @@ void tensor<T>::matmul_general_impl(std::shared_ptr<tensor<T>> a, std::shared_pt
     }
 }
 template <typename T>
-std::shared_ptr<tensor<T>> tensor<T>::matmul(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b)
+std::shared_ptr<synaptic::tensor<T>> synaptic::tensor<T>::matmul(std::shared_ptr<synaptic::tensor<T>> a, std::shared_ptr<synaptic::tensor<T>> b)
 {
-    tensor<T>::dim_check(a, b);
+    synaptic::tensor<T>::dim_check(a, b);
     bool matmul_flag = true;
     auto last_dim = a->dims.size() - 1;
     if (a->dims[last_dim] != b->dims[last_dim - 1])
@@ -339,7 +339,7 @@ std::shared_ptr<tensor<T>> tensor<T>::matmul(std::shared_ptr<tensor<T>> a, std::
 }
 
 template <typename T>
-std::shared_ptr<tensor<T>> tensor<T>::transpose(std::shared_ptr<tensor<T>> a, int dim0, int dim1)
+std::shared_ptr<synaptic::tensor<T>> synaptic::tensor<T>::transpose(std::shared_ptr<synaptic::tensor<T>> a, int dim0, int dim1)
 {
     if (dim0 >= 0 && dim0 < a->dims.size() && dim1 >= 0 && dim1 < a->dims.size() && dim0 != dim1)
     {
@@ -350,7 +350,7 @@ std::shared_ptr<tensor<T>> tensor<T>::transpose(std::shared_ptr<tensor<T>> a, in
     std::swap(output_dims[dim0], output_dims[dim1]);
 
     auto output = std::make_shared<tensor>(output_dims);
-    auto dims_tensor = std::make_shared<tensor<T>>(std::vector<int>{2});
+    auto dims_tensor = std::make_shared<synaptic::tensor<T>>(std::vector<int>{2});
     dims_tensor->data[0]=dim0;
     dims_tensor->data[1]=dim1;
     output->previous_nodes.push_back(a);
@@ -396,9 +396,9 @@ std::shared_ptr<tensor<T>> tensor<T>::transpose(std::shared_ptr<tensor<T>> a, in
 }
 
 template <typename T>
-std::shared_ptr<tensor<T>> tensor<T>::reshape(std::shared_ptr<tensor<T>> a, std::vector<int> new_shape)
+std::shared_ptr<synaptic::tensor<T>> synaptic::tensor<T>::reshape(std::shared_ptr<synaptic::tensor<T>> a, std::vector<int> new_shape)
 {
-    auto output = std::make_shared<tensor<T>>(new_shape);
+    auto output = std::make_shared<synaptic::tensor<T>>(new_shape);
     output->data = a->data;
     output->operation = op::reshape;
     output->previous_nodes.push_back(a);
@@ -407,7 +407,7 @@ std::shared_ptr<tensor<T>> tensor<T>::reshape(std::shared_ptr<tensor<T>> a, std:
 }
 
 template <typename T>
-void tensor<T>::recursive_backprop(std::shared_ptr<tensor<T>> cur)
+void synaptic::tensor<T>::recursive_backprop(std::shared_ptr<synaptic::tensor<T>> cur)
 {
     
     if (cur->operation == op::add)
@@ -447,6 +447,10 @@ void tensor<T>::recursive_backprop(std::shared_ptr<tensor<T>> cur)
     {
         reshape_backprop(cur->previous_nodes[0],*cur);
     }
+    else if (cur->operation == op::relu)
+    {
+        connections::relu<T>::backward(cur->previous_nodes[0],cur);
+    }
     //std::cout<<"recursing"<<std::endl;
     if (cur->previous_nodes.size()!=0 && cur->previous_nodes[0]->operation != op::none)
         recursive_backprop(cur->previous_nodes[0]);
@@ -456,7 +460,7 @@ void tensor<T>::recursive_backprop(std::shared_ptr<tensor<T>> cur)
 }
 
 template <typename T>
-void tensor<T>::backprop()
+void synaptic::tensor<T>::backprop()
 {
     this->grad = std::vector<T>(this->total, 1);
     recursive_backprop(std::make_shared<tensor>(*this));
@@ -465,89 +469,89 @@ void tensor<T>::backprop()
 ;
 
 template <typename T>
-std::shared_ptr<tensor<T>> operator+(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b)
+std::shared_ptr<synaptic::tensor<T>> operator+(std::shared_ptr<synaptic::tensor<T>> a, std::shared_ptr<synaptic::tensor<T>> b)
 {
-    return tensor<T>::add(a, b);
+    return synaptic::tensor<T>::add(a, b);
 }
 
 template <typename T>
-std::shared_ptr<tensor<T>> operator+(std::shared_ptr<tensor<T>> a, T b)
+std::shared_ptr<synaptic::tensor<T>> operator+(std::shared_ptr<synaptic::tensor<T>> a, T b)
 {
-    auto tensorised_scalar = std::make_shared<tensor<T>>(a->dims);
+    auto tensorised_scalar = std::make_shared<synaptic::tensor<T>>(a->dims);
     tensorised_scalar->data = std::vector<T>(tensorised_scalar->total, b);
-    return tensor<T>::add(a, tensorised_scalar);
+    return synaptic::tensor<T>::add(a, tensorised_scalar);
 }
 
 template <typename T>
-std::shared_ptr<tensor<T>> operator+(T a, std::shared_ptr<tensor<T>> b)
+std::shared_ptr<synaptic::tensor<T>> operator+(T a, std::shared_ptr<synaptic::tensor<T>> b)
 {
-    auto tensorised_scalar = std::make_shared<tensor<T>>(b->dims);
+    auto tensorised_scalar = std::make_shared<synaptic::tensor<T>>(b->dims);
     tensorised_scalar->data = std::vector<T>(tensorised_scalar->total, a);
-    return tensor<T>::add(b, tensorised_scalar);
+    return synaptic::tensor<T>::add(b, tensorised_scalar);
 }
 
 template <typename T>
-std::shared_ptr<tensor<T>> operator*(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b)
+std::shared_ptr<synaptic::tensor<T>> operator*(std::shared_ptr<synaptic::tensor<T>> a, std::shared_ptr<synaptic::tensor<T>> b)
 {
-    return tensor<T>::mul(a, b);
+    return synaptic::tensor<T>::mul(a, b);
 }
 
 template <typename T>
-std::shared_ptr<tensor<T>> operator*(std::shared_ptr<tensor<T>> a, T b)
+std::shared_ptr<synaptic::tensor<T>> operator*(std::shared_ptr<synaptic::tensor<T>> a, T b)
 {
-    auto tensorised_scalar = std::make_shared<tensor<T>>(a->dims);
+    auto tensorised_scalar = std::make_shared<synaptic::tensor<T>>(a->dims);
     tensorised_scalar->data = std::vector<T>(tensorised_scalar->total, b);
-    return tensor<T>::mul(a, tensorised_scalar);
+    return synaptic::tensor<T>::mul(a, tensorised_scalar);
 }
 
 template <typename T>
-std::shared_ptr<tensor<T>> operator*(T a, std::shared_ptr<tensor<T>> b)
+std::shared_ptr<synaptic::tensor<T>> operator*(T a, std::shared_ptr<synaptic::tensor<T>> b)
 {
-    auto tensorised_scalar = std::make_shared<tensor<T>>(b->dims);
+    auto tensorised_scalar = std::make_shared<synaptic::tensor<T>>(b->dims);
     tensorised_scalar->data = std::vector<T>(tensorised_scalar->total, a);
-    return tensor<T>::mul(tensorised_scalar, b);
+    return synaptic::tensor<T>::mul(tensorised_scalar, b);
 }
 
 template <typename T>
-std::shared_ptr<tensor<T>> operator/(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b)
+std::shared_ptr<synaptic::tensor<T>> operator/(std::shared_ptr<synaptic::tensor<T>> a, std::shared_ptr<synaptic::tensor<T>> b)
 {
-    return tensor<T>::div(a, b);
+    return synaptic::tensor<T>::div(a, b);
 }
 
 template <typename T>
-std::shared_ptr<tensor<T>> operator/(std::shared_ptr<tensor<T>> a, T b)
+std::shared_ptr<synaptic::tensor<T>> operator/(std::shared_ptr<synaptic::tensor<T>> a, T b)
 {
-    auto tensorised_scalar = std::make_shared<tensor<T>>(a->dims);
+    auto tensorised_scalar = std::make_shared<synaptic::tensor<T>>(a->dims);
     tensorised_scalar->data = std::vector<T>(tensorised_scalar->total, b);
-    return tensor<T>::div(a, tensorised_scalar);
+    return synaptic::tensor<T>::div(a, tensorised_scalar);
 }
 
 template <typename T>
-std::shared_ptr<tensor<T>> operator/(T a, std::shared_ptr<tensor<T>> b)
+std::shared_ptr<synaptic::tensor<T>> operator/(T a, std::shared_ptr<synaptic::tensor<T>> b)
 {
-    auto tensorised_scalar = std::make_shared<tensor<T>>(b->dims);
+    auto tensorised_scalar = std::make_shared<synaptic::tensor<T>>(b->dims);
     tensorised_scalar->data = std::vector<T>(tensorised_scalar->total, a);
-    return tensor<T>::div(tensorised_scalar, b);
+    return synaptic::tensor<T>::div(tensorised_scalar, b);
 }
 
 template <typename T>
-std::shared_ptr<tensor<T>> operator-(std::shared_ptr<tensor<T>> a, std::shared_ptr<tensor<T>> b)
+std::shared_ptr<synaptic::tensor<T>> operator-(std::shared_ptr<synaptic::tensor<T>> a, std::shared_ptr<synaptic::tensor<T>> b)
 {
-    return tensor<T>::sub(a, b);
+    return synaptic::tensor<T>::sub(a, b);
 }
 
 template <typename T>
-std::shared_ptr<tensor<T>> operator-(std::shared_ptr<tensor<T>> a, T b)
+std::shared_ptr<synaptic::tensor<T>> operator-(std::shared_ptr<synaptic::tensor<T>> a, T b)
 {
-    auto tensorised_scalar = std::make_shared<tensor<T>>(a->dims);
+    auto tensorised_scalar = std::make_shared<synaptic::tensor<T>>(a->dims);
     tensorised_scalar->data = std::vector<T>(tensorised_scalar->total, b);
-    return tensor<T>::sub(a, tensorised_scalar);
+    return synaptic::tensor<T>::sub(a, tensorised_scalar);
 }
 
 template <typename T>
-std::shared_ptr<tensor<T>> operator-(T a, std::shared_ptr<tensor<T>> b)
+std::shared_ptr<synaptic::tensor<T>> operator-(T a, std::shared_ptr<synaptic::tensor<T>> b)
 {
-    auto tensorised_scalar = std::make_shared<tensor<T>>(b->dims);
+    auto tensorised_scalar = std::make_shared<synaptic::tensor<T>>(b->dims);
     tensorised_scalar->data = std::vector<T>(tensorised_scalar->total, a);
-    return tensor<T>::sub(b, tensorised_scalar);
+    return synaptic::tensor<T>::sub(b, tensorised_scalar);
 }

@@ -9,7 +9,7 @@
 #include "../include/op_enum.hpp"
 #include "../include/synaptic.hpp"
 #include "../include/connections.hpp"
-
+#include "../include/operands/tensor_add.hpp"
 
 template <typename T>
 std::ostream &operator<<(std::ostream &output, const synaptic::tensor<T> &t)
@@ -165,16 +165,9 @@ void synaptic::tensor<T>::common_tensor_compatibility_tests(std::shared_ptr<syna
 template <typename T>
 std::shared_ptr<synaptic::tensor<T>> synaptic::tensor<T>::add(std::shared_ptr<synaptic::tensor<T>> a, std::shared_ptr<synaptic::tensor<T>> b)
 {
-
-    synaptic::tensor<T>::common_tensor_compatibility_tests(a, b);
-    auto output = std::make_shared<tensor>(a->dims);
-    output->operation = op::add;
-    output->previous_nodes.push_back(a);
-    output->previous_nodes.push_back(b);
-    for (int i = 0; i < a->data.size(); ++i)
-    {
-        output->data[i] = a->data[i] + b->data[i];
-    }
+    auto add_impl = std::make_shared<tensor_add<T>>(a->device);  // Use std::make_shared
+    auto output = add_impl->forward(a, b);
+    output->operand_obj_ptr = add_impl;  // Assign shared_ptr
     return output;
 }
 
@@ -406,7 +399,7 @@ template <typename T>
 void synaptic::tensor<T>::recursive_backprop(std::shared_ptr<synaptic::tensor<T>> cur)
 {
     
-    if (cur->operation == op::add)
+    /* if (cur->operation == op::add)
     {
         add_backprop(cur->previous_nodes[0], cur->previous_nodes[1], *cur);
     }
@@ -447,12 +440,29 @@ void synaptic::tensor<T>::recursive_backprop(std::shared_ptr<synaptic::tensor<T>
     {
         connections::relu<T>::backward(cur->previous_nodes[0],cur);
     }
-    //std::cout<<"recursing"<<std::endl;
+     */
+    std::cout << cur->previous_nodes.size() << std::endl;
+    
+    
+    //cur->operand_obj_ptr->backward(cur->previous_nodes[0], cur, cur->previous_nodes[1]);
+    //std::cout <<  << std::endl;
+    if (cur->previous_nodes.size() == 2)
+    {
+        std::cout << "backward" << std::endl;
+        cur->operand_obj_ptr->backward(cur->previous_nodes[0], cur, cur->previous_nodes[1]);
+        std::cout << "backward done" << std::endl;
+    }
+    
+    else if(cur->previous_nodes.size() == 1)
+    cur->operand_obj_ptr->backward(cur->previous_nodes[0], cur );
+
+    std::cout<<"recursing"<<std::endl;
     if (cur->previous_nodes.size()!=0 && cur->previous_nodes[0]->operation != op::none)
         recursive_backprop(cur->previous_nodes[0]);
 
     if (cur->previous_nodes.size()!=1 && cur->previous_nodes[1]->operation != op::none)
         recursive_backprop(cur->previous_nodes[1]);
+ 
 }
 
 template <typename T>
@@ -462,7 +472,6 @@ void synaptic::tensor<T>::backprop()
     recursive_backprop(std::make_shared<tensor>(*this));
 }
 
-;
 
 template <typename T>
 std::shared_ptr<synaptic::tensor<T>> operator+(std::shared_ptr<synaptic::tensor<T>> a, std::shared_ptr<synaptic::tensor<T>> b)

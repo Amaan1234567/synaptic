@@ -1,13 +1,14 @@
 // tensor.hpp
-#ifndef TENSOR_HPP
-#define TENSOR_HPP
-
+#pragma once
 #include <vector>
 #include <memory>
 #include <iostream>
 #include <cassert>
 #include <algorithm>
 #include "op_enum.hpp"
+#include "device_enum.hpp"
+#include "abstracts/basic_op.hpp"
+
 
 namespace synaptic
 {
@@ -20,6 +21,8 @@ namespace synaptic
         std::vector<type> grad;
         std::vector<int> dims;
         int total;
+        devices device = devices::none;
+        std::shared_ptr<basic_op<type>> operand_obj_ptr=nullptr;
         op operation = op::none;
 
         tensor() : total(1), dims({1}), data({0}), grad({0}) {}
@@ -35,6 +38,24 @@ namespace synaptic
             dims = shape;
         }
         
+
+        /* // Move assignment operator
+        tensor& operator=(tensor&& other) noexcept
+        {
+            if (this != &other)
+            {
+                data = std::move(other.data);
+                previous_nodes = std::move(other.previous_nodes);
+                grad = std::move(other.grad);
+                dims = std::move(other.dims);
+                total = other.total;
+                operand_obj_ptr = std::move(other.operand_obj_ptr);
+            }
+            return *this;
+        } */
+
+        
+
         static void add_backprop(std::shared_ptr<tensor> &a, std::shared_ptr<tensor> &b, const tensor &output);
         static void sub_backprop(std::shared_ptr<tensor> &a, std::shared_ptr<tensor> &b, const tensor &output);
         static void mul_backprop(std::shared_ptr<tensor> &a, std::shared_ptr<tensor> &b, const tensor &output);
@@ -106,6 +127,4 @@ std::shared_ptr<synaptic::tensor<type>> operator-(std::shared_ptr<synaptic::tens
 template <typename type>
 std::shared_ptr<synaptic::tensor<type>> operator-(type a, std::shared_ptr<synaptic::tensor<type>> b);
 
-#include "tensor.tpp"
-
-#endif // TENSOR_HPP
+#include "../src/tensor.tpp"

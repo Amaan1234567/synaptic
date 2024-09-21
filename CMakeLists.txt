@@ -4,9 +4,16 @@ project(synaptic)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_PARALLEL_LEVEL 8)
+
+
+
+
 # Include directories
 include_directories(${CMAKE_SOURCE_DIR}/include/)
+include_directories(${CMAKE_SOURCE_DIR}/include/abstract/)
+include_directories(${CMAKE_SOURCE_DIR}/include/operands/)
 include_directories(${CMAKE_SOURCE_DIR}/src/)
+include_directories(${CMAKE_SOURCE_DIR}/src/operands/)
 include_directories(${CMAKE_SOURCE_DIR}/test/)
 
 # Source files
@@ -18,7 +25,7 @@ file(GLOB MAIN "src/engine.cpp")
 enable_testing()
 
 # Executables
-add_executable(executable ${MAIN})
+#add_executable(executable ${MAIN})
 add_executable(tests ${test_sources})
 
 # GoogleTest integration
@@ -33,7 +40,9 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-# Link gtest and gtest_main libraries to test1
+
+
+
 target_link_libraries(tests gtest gtest_main)
 
 # Register the test

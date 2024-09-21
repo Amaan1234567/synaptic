@@ -18,7 +18,7 @@ include_directories(${CMAKE_SOURCE_DIR}/test/)
 
 # Source files
 file(GLOB SOURCES "src/*.cpp")
-file(GLOB test_sources "test/unit_tests/add_op_tests.cpp")
+file(GLOB test_sources "test/unit_tests/*.cpp")
 file(GLOB MAIN "src/engine.cpp")
 
 # Enable testing

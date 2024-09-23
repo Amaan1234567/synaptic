@@ -1,4 +1,4 @@
-#include "../../include/relu.hpp"
+#include "../../include/connections/relu.hpp"
 #include "../../include/device_enum.hpp"
 
 namespace synaptic

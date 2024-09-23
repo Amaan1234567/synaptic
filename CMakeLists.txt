@@ -1,12 +1,9 @@
 cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
-project(synaptic)
+project(synaptic LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_BUILD_PARALLEL_LEVEL 8)
-
-
-
+set(CMAKE_BUILD_PARALLEL_LEVEL 4)
 
 # Include directories
 include_directories(${CMAKE_SOURCE_DIR}/include/)
@@ -16,17 +13,26 @@ include_directories(${CMAKE_SOURCE_DIR}/src/)
 include_directories(${CMAKE_SOURCE_DIR}/src/operands/)
 include_directories(${CMAKE_SOURCE_DIR}/test/)
 
-# Source files
-file(GLOB SOURCES "src/*.cpp")
-file(GLOB test_sources "test/unit_tests/*.cpp")
-file(GLOB MAIN "src/engine.cpp")
+# Source files for the library
+file(GLOB SOURCES "test/unit_tests/test_runner.cpp")
+set_source_files_properties(${SOURCES} PROPERTIES LANGUAGE CXX)
+# Define the shared library
+add_library(synaptic SHARED ${SOURCES})
+
+# Optionally, install the shared library
+install(TARGETS synaptic DESTINATION lib)
 
 # Enable testing
 enable_testing()
 
-# Executables
-#add_executable(executable ${MAIN})
+# Source files for tests
+file(GLOB test_sources "test/unit_tests/*.cpp")
+
+# Create the test executable
 add_executable(tests ${test_sources})
+
+# Link the synaptic library to the test executable
+target_link_libraries(tests synaptic)
 
 # GoogleTest integration
 include(FetchContent)
@@ -40,9 +46,7 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-
-
-
+# Link GoogleTest with the test executable
 target_link_libraries(tests gtest gtest_main)
 
 # Register the test

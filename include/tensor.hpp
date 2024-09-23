@@ -54,18 +54,6 @@ namespace synaptic
             return *this;
         } */
 
-        
-
-        static void add_backprop(std::shared_ptr<tensor> &a, std::shared_ptr<tensor> &b, const tensor &output);
-        static void sub_backprop(std::shared_ptr<tensor> &a, std::shared_ptr<tensor> &b, const tensor &output);
-        static void mul_backprop(std::shared_ptr<tensor> &a, std::shared_ptr<tensor> &b, const tensor &output);
-        static void div_backprop(std::shared_ptr<tensor> &a, std::shared_ptr<tensor> &b, const tensor &output);
-        static void pow_backprop(std::shared_ptr<tensor> &a, std::shared_ptr<tensor> &b, const tensor &output);
-        static void exp_backprop(std::shared_ptr<tensor> &a, const tensor &output);
-        static void matmul_backprop(std::shared_ptr<tensor> &a, std::shared_ptr<tensor> &b, const tensor &output);
-        static void transpose_backprop(std::shared_ptr<tensor> &a, std::shared_ptr<tensor> &dims_tensor, std::shared_ptr<tensor> &output);
-        static void reshape_backprop(std::shared_ptr<tensor> &a, const tensor &output);
-        static void matmul_general_impl(std::shared_ptr<tensor<type>> a, std::shared_ptr<tensor<type>> b, std::shared_ptr<tensor<type>> output, std::vector<int> &custom_dims_a, std::vector<int> &custom_dims_b);
 
         static bool dim_check(std::shared_ptr<tensor> a, std::shared_ptr<tensor> b);
         static bool shape_check(std::shared_ptr<tensor> a, std::shared_ptr<tensor> b);

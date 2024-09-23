@@ -8,6 +8,7 @@ enum class devices
     cuda,
     rocm,
     mps,
+    vulcan,
 };
 
 #endif

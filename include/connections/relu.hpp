@@ -13,8 +13,16 @@ namespace synaptic
         class relu : public basic_op<type>
         {
         public:
+            relu(devices dev = devices::none, type val1 = type(1), type val2 = type(0))
+                : device(dev), non_linearity_multiplier(val1), below_thres_value(val2) {}
 
-            relu(devices dev = devices::none, type val1 = type(1), type val2 = type(0)) : device(dev), non_linearity_multiplier(val1), below_thres_value(val2) {}
+            // Overload: Takes only val1 and val2 (device defaults to none)
+            relu(type val1, type val2)
+                : device(devices::none), non_linearity_multiplier(val1), below_thres_value(val2) {}
+
+            // Overload: Takes only val1 (device defaults to none, val2 defaults to 0)
+            relu(type val1)
+                : device(devices::none), non_linearity_multiplier(val1), below_thres_value(type(0)) {}
 
             type non_linearity_multiplier = type(1);
             type below_thres_value = type(0);
@@ -39,4 +47,4 @@ namespace synaptic
     }
 }
 
-#include "../src/relu.tpp"
+#include "../src/connections/relu.tpp"

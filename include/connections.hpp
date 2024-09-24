@@ -1,7 +1,8 @@
 #ifndef CONNECTIONS_HPP
 #define CONNECTIONS_HPP
 
-#include "relu.hpp"
+#include "connections/relu.hpp"
+#include "connections/sigmoid.hpp"
 
 namespace synaptic
 {

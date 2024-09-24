@@ -17,10 +17,10 @@ include_directories(${CMAKE_SOURCE_DIR}/test/)
 file(GLOB SOURCES "test/unit_tests/test_runner.cpp")
 set_source_files_properties(${SOURCES} PROPERTIES LANGUAGE CXX)
 # Define the shared library
-add_library(synaptic SHARED ${SOURCES})
+#add_library(synaptic SHARED ${SOURCES})
 
 # Optionally, install the shared library
-install(TARGETS synaptic DESTINATION lib)
+#install(TARGETS synaptic DESTINATION lib)
 
 # Enable testing
 enable_testing()
@@ -32,7 +32,6 @@ file(GLOB test_sources "test/unit_tests/*.cpp")
 add_executable(tests ${test_sources})
 
 # Link the synaptic library to the test executable
-target_link_libraries(tests synaptic)
 
 # GoogleTest integration
 include(FetchContent)

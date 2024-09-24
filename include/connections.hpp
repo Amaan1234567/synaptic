@@ -3,6 +3,7 @@
 
 #include "connections/relu.hpp"
 #include "connections/sigmoid.hpp"
+#include "connections/tanh.hpp"
 
 namespace synaptic
 {

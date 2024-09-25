@@ -15,7 +15,7 @@ TEST(TensorTest, TensorSigmoid)
         1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000,
         1.0000, 1.0000, 1.0000};
 
-    for (int i = 0; i < res->dims.size(); i++)
+    for (int i = 0; i < res->data.size(); i++)
     {
         EXPECT_NEAR(res->data[i], expected[i],0.001);
     }

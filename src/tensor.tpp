@@ -22,7 +22,7 @@
 template <typename type>
 std::ostream &operator<<(std::ostream &output, const synaptic::tensor<type> &t)
 {
-    output << "typeensor:\nData: \n";
+    output << "tensor:\nData: \n";
     for (const auto &ele : t.data)
     {
         output << ele << " ";
@@ -164,19 +164,19 @@ void synaptic::tensor<type>::recursive_backprop(std::shared_ptr<synaptic::tensor
     // std::cout <<  << std::endl;
     if (cur->previous_nodes.size() == 2)
     {
-        // std::cout << "backward" << std::endl;
+        std::cout << "backward" << std::endl;
         cur->operand_obj_ptr->backward(cur->previous_nodes[0], cur, cur->previous_nodes[1]);
-        // std::cout << "backward done" << std::endl;
+        std::cout << "backward done" << std::endl;
     }
     else if (cur->previous_nodes.size() == 1)
         cur->operand_obj_ptr->backward(cur->previous_nodes[0], cur);
     else
         return;
 
-    // std::cout<<"recursing"<<std::endl;
+    std::cout<<"recursing"<<std::endl;
     if (cur->previous_nodes.size() != 0)
     {
-        // std::cout<<"inside"<<std::endl;
+        std::cout<<"inside"<<std::endl;
         recursive_backprop(cur->previous_nodes[0]);
     }
 

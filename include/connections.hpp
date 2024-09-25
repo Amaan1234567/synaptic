@@ -4,6 +4,7 @@
 #include "connections/relu.hpp"
 #include "connections/sigmoid.hpp"
 #include "connections/tanh.hpp"
+#include "connections/silu.hpp"
 
 namespace synaptic
 {

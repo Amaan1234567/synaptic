@@ -8,6 +8,10 @@
 #include "op_enum.hpp"
 #include "device_enum.hpp"
 #include "abstracts/basic_op.hpp"
+#include "../logging/logging.hpp"
+
+
+
 
 
 namespace synaptic
@@ -24,6 +28,7 @@ namespace synaptic
         devices device = devices::none;
         std::shared_ptr<basic_op<type>> operand_obj_ptr=nullptr;
         op operation = op::none;
+        
 
         tensor() : total(1), dims({1}), data({0}), grad({0}) {}
         tensor(const std::vector<int> &shape)

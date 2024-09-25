@@ -5,6 +5,21 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_PARALLEL_LEVEL 8)
 
+
+set(DEBUG 0)
+set(INFO 1)
+set(WARNING 2)
+set(ERROR 3)
+set(CRITICAL 4)
+set(SYNAPTIC_LOG_LEVEL ${INFO})  # INFO level by default
+
+# Set the log file path
+set(SYNAPTIC_LOG_FILE "\"../logs.log\"")
+
+# Add definitions to pass to the compiler
+add_compile_definitions(SYNAPTIC_LOG_LEVEL=${SYNAPTIC_LOG_LEVEL})
+add_compile_definitions(SYNAPTIC_LOG_FILE=${SYNAPTIC_LOG_FILE})
+
 # Include directories
 include_directories(${CMAKE_SOURCE_DIR}/include/)
 include_directories(${CMAKE_SOURCE_DIR}/include/abstract/)

@@ -19,6 +19,7 @@
 #include "../include/operands/tensor_pow.hpp"
 #include "../include/operands/tensor_exp.hpp"
 
+
 template <typename type>
 std::ostream &operator<<(std::ostream &output, const synaptic::tensor<type> &t)
 {
@@ -77,7 +78,7 @@ std::shared_ptr<synaptic::tensor<type>> synaptic::tensor<type>::add(std::shared_
 {
     auto add_impl = std::make_shared<tensor_add<type>>(operand1->device); // Use std::make_shared
     auto output = add_impl->forward(operand1, operand2);
-    // std::cout << "add_impl: " << add_impl << std::endl;
+    
     return output;
 }
 
@@ -86,7 +87,7 @@ std::shared_ptr<synaptic::tensor<type>> synaptic::tensor<type>::sub(std::shared_
 {
     auto sub_impl = std::make_shared<tensor_sub<type>>(operand1->device); // Use std::make_shared
     auto output = sub_impl->forward(operand1, operand2);
-    // std::cout << "add_impl: " << add_impl << std::endl;
+    
     return output;
 }
 
@@ -95,7 +96,7 @@ std::shared_ptr<synaptic::tensor<type>> synaptic::tensor<type>::mul(std::shared_
 {
     auto mul_impl = std::make_shared<tensor_mul<type>>(operand1->device); // Use std::make_shared
     auto output = mul_impl->forward(operand1, operand2);
-    // std::cout << "add_impl: " << add_impl << std::endl;
+    
     return output;
 }
 
@@ -104,7 +105,7 @@ std::shared_ptr<synaptic::tensor<type>> synaptic::tensor<type>::div(std::shared_
 {
     auto div_impl = std::make_shared<tensor_div<type>>(operand1->device); // Use std::make_shared
     auto output = div_impl->forward(operand1, operand2);
-    // std::cout << "add_impl: " << add_impl << std::endl;
+    
     return output;
 }
 
@@ -113,7 +114,7 @@ std::shared_ptr<synaptic::tensor<type>> synaptic::tensor<type>::pow(std::shared_
 {
     auto div_impl = std::make_shared<tensor_pow<type>>(operand1->device, pow); // Use std::make_shared
     auto output = div_impl->forward(operand1);
-    // std::cout << "add_impl: " << add_impl << std::endl;
+    
     return output;
 }
 
@@ -122,7 +123,7 @@ std::shared_ptr<synaptic::tensor<type>> synaptic::tensor<type>::exp(std::shared_
 {
     auto div_impl = std::make_shared<tensor_exp<type>>(operand1->device); // Use std::make_shared
     auto output = div_impl->forward(operand1);
-    // std::cout << "add_impl: " << add_impl << std::endl;
+    
     return output;
 }
 
@@ -132,7 +133,7 @@ std::shared_ptr<synaptic::tensor<type>> synaptic::tensor<type>::matmul(std::shar
 {
     auto div_impl = std::make_shared<tensor_matmul<type>>(operand1->device); // Use std::make_shared
     auto output = div_impl->forward(operand1, operand2);
-    // std::cout << "add_impl: " << add_impl << std::endl;
+    
     return output;
 }
 
@@ -141,7 +142,7 @@ std::shared_ptr<synaptic::tensor<type>> synaptic::tensor<type>::transpose(std::s
 {
     auto div_impl = std::make_shared<tensor_transpose<type>>(operand1->device, dim0, dim1); // Use std::make_shared
     auto output = div_impl->forward(operand1);
-    // std::cout << "add_impl: " << add_impl << std::endl;
+    
     return output;
 }
 
@@ -150,33 +151,34 @@ std::shared_ptr<synaptic::tensor<type>> synaptic::tensor<type>::reshape(std::sha
 {
     auto div_impl = std::make_shared<tensor_reshape<type>>(operand1->device, new_shape); // Use std::make_shared
     auto output = div_impl->forward(operand1);
-    // std::cout << "add_impl: " << add_impl << std::endl;
+    
     return output;
 }
 
 template <typename type>
 void synaptic::tensor<type>::recursive_backprop(std::shared_ptr<synaptic::tensor<type>> cur)
 {
-
+    
     std::cout << cur->previous_nodes.size() << std::endl;
 
     // cur->operand_obj_ptr->backward(cur->previous_nodes[0], cur, cur->previous_nodes[1]);
     // std::cout <<  << std::endl;
     if (cur->previous_nodes.size() == 2)
     {
-        std::cout << "backward" << std::endl;
+        LOG_DEBUG("tensor class","backward");
         cur->operand_obj_ptr->backward(cur->previous_nodes[0], cur, cur->previous_nodes[1]);
-        std::cout << "backward done" << std::endl;
+        LOG_DEBUG("tensor class","backward done");
+
     }
     else if (cur->previous_nodes.size() == 1)
         cur->operand_obj_ptr->backward(cur->previous_nodes[0], cur);
     else
         return;
 
-    std::cout<<"recursing"<<std::endl;
+    LOG_DEBUG("tensor class","recursing");
     if (cur->previous_nodes.size() != 0)
     {
-        std::cout<<"inside"<<std::endl;
+        LOG_DEBUG("tensor class","inside");
         recursive_backprop(cur->previous_nodes[0]);
     }
 
@@ -278,3 +280,4 @@ std::shared_ptr<synaptic::tensor<type>> operator-(type operand1, std::shared_ptr
     tensorised_scalar->data = std::vector<type>(tensorised_scalar->total, operand1);
     return synaptic::tensor<type>::sub(operand2, tensorised_scalar);
 }
+

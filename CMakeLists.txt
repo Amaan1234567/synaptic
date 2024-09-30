@@ -15,7 +15,7 @@ set(SYNAPTIC_LOG_LEVEL ${INFO})  # INFO level by default
 
 # Set the log file path
 if(MSVC)
-  set(SYNAPTIC_LOG_FILE "../logs.log")  # No need to escape quotes in CMake
+  set(SYNAPTIC_LOG_FILE "..\\logs.log")  # No need to escape quotes in CMake
 else()
   set(SYNAPTIC_LOG_FILE "../logs.log")
 endif()

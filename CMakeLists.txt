@@ -14,23 +14,26 @@ set(CRITICAL 4)
 set(SYNAPTIC_LOG_LEVEL ${INFO})  # INFO level by default
 
 # Set the log file path
-set(SYNAPTIC_LOG_FILE "\"../logs.log\"")
+if(MSVC)
+  set(SYNAPTIC_LOG_FILE "../logs.log")  # No need to escape quotes in CMake
+else()
+  set(SYNAPTIC_LOG_FILE "../logs.log")
+endif()
 
 # Add definitions to pass to the compiler
 add_compile_definitions(SYNAPTIC_LOG_LEVEL=${SYNAPTIC_LOG_LEVEL})
-add_compile_definitions(SYNAPTIC_LOG_FILE=${SYNAPTIC_LOG_FILE})
+add_compile_definitions(SYNAPTIC_LOG_FILE=\"${SYNAPTIC_LOG_FILE}\")
+
 
 # Include directories
-include_directories(${CMAKE_SOURCE_DIR}/include/)
-include_directories(${CMAKE_SOURCE_DIR}/include/abstract/)
-include_directories(${CMAKE_SOURCE_DIR}/include/operands/)
-include_directories(${CMAKE_SOURCE_DIR}/src/)
-include_directories(${CMAKE_SOURCE_DIR}/src/operands/)
-include_directories(${CMAKE_SOURCE_DIR}/test/)
+include_directories(${CMAKE_SOURCE_DIR}/include)
+
+include_directories(${CMAKE_SOURCE_DIR}/src)
+include_directories(${CMAKE_SOURCE_DIR}/src/logging/)
+include_directories(${CMAKE_SOURCE_DIR}/test)
 
 # Source files for the library
 file(GLOB SOURCES "test/unit_tests/test_runner.cpp")
-set_source_files_properties(${SOURCES} PROPERTIES LANGUAGE CXX)
 # Define the shared library
 #add_library(synaptic SHARED ${SOURCES})
 

@@ -8,7 +8,7 @@
 #include "op_enum.hpp"
 #include "device_enum.hpp"
 #include "abstracts/basic_op.hpp"
-#include "../logging/logging.hpp"
+#include "logging.hpp"
 
 
 

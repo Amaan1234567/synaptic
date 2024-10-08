@@ -6,18 +6,18 @@
 #include <stdexcept>
 #include <limits>
 #include <cmath>
-#include "../include/op_enum.hpp"
-#include "../include/synaptic.hpp"
-#include "../include/connections.hpp"
-#include "../include/operands/tensor_add.hpp"
-#include "../include/operands/tensor_sub.hpp"
-#include "../include/operands/tensor_mul.hpp"
-#include "../include/operands/tensor_div.hpp"
-#include "../include/operands/tensor_matmul.hpp"
-#include "../include/operands/tensor_transpose.hpp"
-#include "../include/operands/tensor_reshape.hpp"
-#include "../include/operands/tensor_pow.hpp"
-#include "../include/operands/tensor_exp.hpp"
+#include "op_enum.hpp"
+#include "synaptic.hpp"
+#include "connections.hpp"
+#include "tensor_add.hpp"
+#include "tensor_sub.hpp"
+#include "tensor_mul.hpp"
+#include "tensor_div.hpp"
+#include "tensor_matmul.hpp"
+#include "tensor_transpose.hpp"
+#include "tensor_reshape.hpp"
+#include "tensor_pow.hpp"
+#include "tensor_exp.hpp"
 
 
 template <typename type>

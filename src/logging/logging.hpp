@@ -14,8 +14,12 @@
 
 
 
-#ifndef SYNAPTIC_LOG_FILE
-#define SYNAPTIC_LOG_FILE std::string_view("~/Documents/synaptic/logs.log")
+#ifndef SYNAPTIC_LOG_FILE 
+    #ifdef _WIN32
+    #define SYNAPTIC_LOG_FILE std::string_view("..\\synaptic\\logs.log")
+    #else
+    #define SYNAPTIC_LOG_FILE std::string_view("../synaptic/logs.log")
+    #endif
 #endif
 
 #ifndef SYNAPTIC_LOG_LEVEL

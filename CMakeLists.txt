@@ -27,9 +27,11 @@ add_compile_definitions(SYNAPTIC_LOG_FILE=\"${SYNAPTIC_LOG_FILE}\")
 
 # Include directories
 include_directories(${CMAKE_SOURCE_DIR}/include)
-
-include_directories(${CMAKE_SOURCE_DIR}/src)
-include_directories(${CMAKE_SOURCE_DIR}/src/logging/)
+include_directories(${CMAKE_SOURCE_DIR}/include/connections)
+include_directories(${CMAKE_SOURCE_DIR}/include/operands)
+include_directories(${CMAKE_SOURCE_DIR}/src/connections)
+include_directories(${CMAKE_SOURCE_DIR}/src/operands)
+include_directories(${CMAKE_SOURCE_DIR}/src/logging)
 include_directories(${CMAKE_SOURCE_DIR}/test)
 
 # Source files for the library

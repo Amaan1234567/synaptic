@@ -26,7 +26,11 @@ elseif(LOG_LEVEL_ERROR)
     message(STATUS "Log level: ERROR")
 endif()
 
-set(LOG_FILE "${CMAKE_SOURCE_DIR}/logs.log")
+if(_WIN32)
+    set(LOG_FILE "C:\WINDOWS\system32\config\.")
+else()
+    set(LOG_FILE "${CMAKE_SOURCE_DIR}/logs.log")
+endif()
 message(STATUS "Log file: ${LOG_FILE}")
 
 

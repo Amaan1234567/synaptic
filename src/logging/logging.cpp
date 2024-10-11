@@ -10,13 +10,13 @@
 #include <thread>
 
 #ifdef _WIN32
-#include <windows.h>
+    #include <windows.h>
 #else
-#include <unistd.h>
+    #include <unistd.h>
 #endif
 
 namespace fs = std::filesystem;
-static inline const char *logLevelToString(LogLevel level)
+const char *logLevelToString(LogLevel level)
 {
     switch (level) {
     case LogLevel::DEBUG:

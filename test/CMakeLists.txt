@@ -27,7 +27,7 @@ elseif(LOG_LEVEL_ERROR)
 endif()
 
 if(_WIN32)
-    set(LOG_FILE "C:\WINDOWS\system32\config\.")
+    set(LOG_FILE "D:\a\synaptic\synaptic/build")
 else()
     set(LOG_FILE "${CMAKE_SOURCE_DIR}/logs.log")
 endif()

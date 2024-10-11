@@ -42,7 +42,7 @@ TEST(TensorTest, TensorSigmoidWithSlopeParam)
 
 TEST(TensorTest, TensorSigmoidBackpropCheck)
 {
-    auto t4 = std::make_shared<synaptic::tensor<float>>(std::vector<int>{2, 2});
+    auto t4 = std::make_shared<synaptic::tensor<float>>(std::vector<int>{5,3,2});
     t4->data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30};
 
     synaptic::connections::sigmoid<float> sigmoid = synaptic::connections::sigmoid<float>();
@@ -64,7 +64,7 @@ TEST(TensorTest, TensorSigmoidBackpropCheck)
 
 TEST(TensorTest, TensorSigmoidBackpropCheckWithSlopeParam)
 {
-    auto t4 = std::make_shared<synaptic::tensor<float>>(std::vector<int>{2, 2});
+    auto t4 = std::make_shared<synaptic::tensor<float>>(std::vector<int>{5,3,2});
     t4->data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30};
 
     synaptic::connections::sigmoid<float> sigmoid = synaptic::connections::sigmoid<float>(2.0f);

@@ -85,7 +85,6 @@ namespace synaptic
                     output->data[i] = denominator->data[i]/denominator_sum; // Ensure uninitialized data is handled
             }
 
-            output->previous_nodes.push_back(operand1);
             output->previous_nodes.push_back(denominator);
             
             return output;
@@ -100,9 +99,17 @@ namespace synaptic
         template <typename type>
         void softmax<type>::general_backward(std::shared_ptr<tensor<type>> operand1, std::shared_ptr<tensor<type>> output, std::shared_ptr<tensor<type>> operand2)
         {
+            std::cout << "inside backprop" << std::endl;
             for (int i = 0; i < output->total; i++)
             {
-                operand1->grad[i] += this->slope_param * output->data[i]*(type(1) - output->data[i]) * output->grad[i];
+                for(int j=0; j < output->total; j++)
+                {
+                    if(i==j)
+                    operand1->grad[i] += output->data[i] *(type(1) - output->data[j]) * output->grad[i];
+                    else
+                    operand1->grad[i] += -output->data[i] * output->data[j] * output->grad[i];
+                    
+                }
                 // std::cout<< *operand1 <<std::endl;
             }
         }

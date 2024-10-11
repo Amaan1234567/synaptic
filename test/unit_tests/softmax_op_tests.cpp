@@ -4,7 +4,7 @@
 
 TEST(TensorTest, TensorSoftmax)
 {
-    auto t4 = std::make_shared<synaptic::tensor<float>>(std::vector<int>{5, 3, 2});
+    auto t4 = std::make_shared<synaptic::tensor<float>>(std::vector<int>{30});
     t4->data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30};
 
     synaptic::connections::softmax<float> softmax = synaptic::connections::softmax<float>();
@@ -22,25 +22,29 @@ TEST(TensorTest, TensorSoftmax)
     }
 }
 
-/* TEST(TensorTest, TensorsoftmaxBackpropCheck)
+TEST(TensorTest, TensorSoftmaxBackpropCheck)
 {
-    auto t4 = std::make_shared<synaptic::tensor<float>>(std::vector<int>{2, 2});
+
+
+    auto t4 = std::make_shared<synaptic::tensor<float>>(std::vector<int>{30});
     t4->data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30};
 
     synaptic::connections::softmax<float> softmax = synaptic::connections::softmax<float>();
     auto res = softmax.forward(t4);
-    //std::cout << *res << std::endl;
-    std::vector<float> expected = std::vector<float>{1.9661e-01, 1.0499e-01, 4.5177e-02, 1.7663e-02, 6.6480e-03, 2.4665e-03,
-        9.1017e-04, 3.3522e-04, 1.2337e-04, 4.5417e-05, 1.6689e-05, 6.1988e-06,
-        2.2650e-06, 8.3446e-07, 3.5763e-07, 1.1921e-07, 0.0000e+00, 0.0000e+00,
-        0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00,
-        0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00};
+    std::cout << "inside" << std::endl;
+    std::cout << *res << std::endl;
+    std::vector<float> expected = std::vector<float>{-1.9168e-20, -5.2103e-20, -1.4163e-19, -3.8499e-19, -1.0465e-18,
+        -2.8447e-18, -7.7328e-18, -2.1020e-17, -5.7138e-17, -1.5532e-16,
+        -4.2220e-16, -1.1476e-15, -3.1196e-15, -8.4800e-15, -2.3051e-14,
+        -6.2660e-14, -1.7033e-13, -4.6299e-13, -1.2586e-12, -3.4211e-12,
+        -9.2995e-12, -2.5279e-11, -6.8715e-11, -1.8679e-10, -5.0774e-10,
+        -1.3802e-09, -3.7517e-09, -1.0198e-08, -2.7721e-08, -7.5355e-08};
 
     res->backprop();
     for (int i = 0; i < res->total; i++)
     {
         EXPECT_NEAR(t4->grad[i], expected[i],0.001);
     }
-} */
+}
 
 

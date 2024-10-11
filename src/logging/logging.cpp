@@ -16,48 +16,23 @@
 #endif
 
 namespace fs = std::filesystem;
-
-#ifdef _WIN32
-    const char *logLevelToString(LogLevel level)
-    {
-        switch (level) {
-        case DEBUG:
-            return "DEBUG";
-        case INFO:
-            return "INFO";
-        case WARNING:
-            return "WARNING";
-        case ERROR:
-            return "ERROR";
-        case CRITICAL:
-            return "CRITICAL";
-        default:
-            return "UNKNOWN";
-        }
-    }
-
-#else
-    const char *logLevelToString(LogLevel level)
+const char *logLevelToString(LogLevel level)
 {
-        switch (level) {
-        case LogLevel::DEBUG:
-            return "DEBUG";
-        case LogLevel::INFO:
-            return "INFO";
-        case LogLevel::WARNING:
-            return "WARNING";
-        case LogLevel::ERROR:
-            return "ERROR";
-        case LogLevel::CRITICAL:
-            return "CRITICAL";
-        default:
-            return "UNKNOWN";
-        }
+    switch (static_cast<int>(level)) {
+    case 0:
+        return "DEBUG";
+    case 1:
+        return "INFO";
+    case 2:
+        return "WARNING";
+    case 3:
+        return "ERROR";
+    case 4:
+        return "CRITICAL";
+    default:
+        return "UNKNOWN";
     }
-
-#endif
-
-
+}
 
 static inline std::string getTimestamp()
 {

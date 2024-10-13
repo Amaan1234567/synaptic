@@ -13,10 +13,10 @@ namespace synaptic
         {
         public:
 
-            softmax(devices dev = devices::none, type slope_param = type(1)) : device(dev), slope_param(slope_param) {}
-            softmax(type slope_param) : device(devices::none), slope_param(slope_param) {}
+            softmax(devices dev = devices::none, int dim = -1) : device(dev), dim(dim) {}
+            softmax(type dim) : device(devices::none), dim(dim) {}
 
-            type slope_param = type(1);
+            int dim = -1;
             devices device = devices::none;
 
             // Use std::function instead of function pointer

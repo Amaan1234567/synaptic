@@ -105,7 +105,7 @@ namespace synaptic
                 for(int j=0; j < output->total; j++)
                 {
                     if(i==j)
-                    operand1->grad[i] += output->data[i] *(type(1) - output->data[j]) * output->grad[i];
+                    operand1->grad[i] += output->data[i] * (type(1) - output->data[j]) * output->grad[i];
                     else
                     operand1->grad[i] += -output->data[i] * output->data[j] * output->grad[i];
                     

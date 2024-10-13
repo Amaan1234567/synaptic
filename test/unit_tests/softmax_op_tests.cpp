@@ -9,7 +9,7 @@ TEST(TensorTest, TensorSoftmax)
 
     synaptic::connections::softmax<float> softmax = synaptic::connections::softmax<float>();
     auto res = softmax.forward(t4);
-    //std::cout << *res << std::endl;
+    std::cout << *res << std::endl;
     std::vector<float> expected = std::vector<float>{1.6079e-13, 4.3707e-13, 1.1881e-12, 3.2296e-12, 8.7789e-12, 2.3863e-11,
         6.4867e-11, 1.7633e-10, 4.7931e-10, 1.3029e-09, 3.5416e-09, 9.6272e-09,
         2.6169e-08, 7.1136e-08, 1.9337e-07, 5.2563e-07, 1.4288e-06, 3.8839e-06,
@@ -32,7 +32,7 @@ TEST(TensorTest, TensorSoftmaxBackpropCheck)
     synaptic::connections::softmax<float> softmax = synaptic::connections::softmax<float>();
     auto res = softmax.forward(t4);
     std::cout << "inside" << std::endl;
-    std::cout << *res << std::endl;
+    
     std::vector<float> expected = std::vector<float>{-1.9168e-20, -5.2103e-20, -1.4163e-19, -3.8499e-19, -1.0465e-18,
         -2.8447e-18, -7.7328e-18, -2.1020e-17, -5.7138e-17, -1.5532e-16,
         -4.2220e-16, -1.1476e-15, -3.1196e-15, -8.4800e-15, -2.3051e-14,
@@ -41,9 +41,10 @@ TEST(TensorTest, TensorSoftmaxBackpropCheck)
         -1.3802e-09, -3.7517e-09, -1.0198e-08, -2.7721e-08, -7.5355e-08};
 
     res->backprop();
+    std::cout << *t4 << std::endl;
     for (int i = 0; i < res->total; i++)
     {
-        EXPECT_NEAR(t4->grad[i], expected[i],0.001);
+        EXPECT_NEAR(t4->grad[i], expected[i],0.00001);
     }
 }
 

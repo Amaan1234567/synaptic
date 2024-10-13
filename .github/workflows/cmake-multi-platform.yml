@@ -56,4 +56,4 @@ jobs:
 
       - name: Test
         working-directory: ${{ steps.strings.outputs.build-output-dir }}
-        run: cd ${{ steps.strings.outputs.build-output-dir }}/test && ctest --build-config ${{ matrix.build_type }}
+        run: ctest --build-config ${{ matrix.build_type }}

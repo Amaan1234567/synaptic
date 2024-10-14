@@ -62,8 +62,7 @@ namespace synaptic
             impl(operand1, output, operand2);
         }
 
-        // The rest of the implementations (cpu_forward, cpu_backward, general_forward, general_backward)
-        // remain the same as they were in your original code.
+        
 
         template <typename type>
         std::shared_ptr<tensor<type>> silu<type>::general_forward(std::shared_ptr<tensor<type>> operand1, std::shared_ptr<tensor<type>> operand2)

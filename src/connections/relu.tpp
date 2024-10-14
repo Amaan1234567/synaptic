@@ -59,8 +59,7 @@ namespace synaptic
             impl(operand1, output, operand2);
         }
 
-        // The rest of the implementations (cpu_forward, cpu_backward, general_forward, general_backward)
-        // remain the same as they were in your original code.
+        
 
         template <typename type>
         std::shared_ptr<tensor<type>> relu<type>::general_forward(std::shared_ptr<tensor<type>> operand1, std::shared_ptr<tensor<type>> operand2)
@@ -74,7 +73,7 @@ namespace synaptic
                 if (operand1->data[i] > type(0))
                     output->data[i] = operand1->data[i] * this->non_linearity_multiplier;
                 else
-                    output->data[i] = this->below_thres_value; // Ensure uninitialized data is handled
+                    output->data[i] = this->below_thres_value; 
             }
             return output;
         }

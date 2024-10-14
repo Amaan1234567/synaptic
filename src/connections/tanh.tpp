@@ -60,8 +60,7 @@ namespace synaptic
             impl(operand1, output, operand2);
         }
 
-        // The rest of the implementations (cpu_forward, cpu_backward, general_forward, general_backward)
-        // remain the same as they were in your original code.
+        
 
         template <typename type>
         std::shared_ptr<tensor<type>> tanh<type>::general_forward(std::shared_ptr<tensor<type>> operand1, std::shared_ptr<tensor<type>> operand2)
@@ -74,7 +73,7 @@ namespace synaptic
             {
                 type data1 = std::exp(operand1->data[i]);
                 type data2 = std::exp(-operand1->data[i]);
-                output->data[i] = (data1-data2)/(data1+data2); // Ensure uninitialized data is handled
+                output->data[i] = (data1-data2)/(data1+data2); 
             }
             return output;
         }

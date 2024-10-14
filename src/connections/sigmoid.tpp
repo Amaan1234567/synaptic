@@ -60,8 +60,7 @@ namespace synaptic
             impl(operand1, output, operand2);
         }
 
-        // The rest of the implementations (cpu_forward, cpu_backward, general_forward, general_backward)
-        // remain the same as they were in your original code.
+        
 
         template <typename type>
         std::shared_ptr<tensor<type>> sigmoid<type>::general_forward(std::shared_ptr<tensor<type>> operand1, std::shared_ptr<tensor<type>> operand2)
@@ -72,7 +71,7 @@ namespace synaptic
 
             for (int i = 0; i < operand1->total; i++)
             {
-                    output->data[i] = type(1)/(type(1)+std::exp(-this->slope_param*operand1->data[i])); // Ensure uninitialized data is handled
+                    output->data[i] = type(1)/(type(1)+std::exp(-this->slope_param*operand1->data[i])); 
             }
             return output;
         }

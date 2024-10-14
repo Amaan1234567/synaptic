@@ -62,31 +62,115 @@ namespace synaptic
             impl(operand1, output, operand2);
         }
 
-        // The rest of the implementations (cpu_forward, cpu_backward, general_forward, general_backward)
-        // remain the same as they were in your original code.
-
         template <typename type>
         std::shared_ptr<tensor<type>> softmax<type>::general_forward(std::shared_ptr<tensor<type>> operand1, std::shared_ptr<tensor<type>> operand2)
         {
+            if(this->dim<0)
+            this->dim = operand1->dims.size()+this->dim;
+
             auto output = std::make_shared<tensor<type>>(operand1->dims);
             output->operand_obj_ptr = std::make_shared<softmax<type>>(*this);
 
-            type max = *std::max_element(operand1->data.begin(),operand1->data.end());
+            type max = *std::max_element(operand1->data.begin(), operand1->data.end());
             auto adjusted_operand = operand1 - max;
-            
+
             auto exp = std::make_shared<tensor_exp<type>>();
 
-            auto denominator = exp->forward(adjusted_operand);
+            auto expd_tensor = exp->forward(adjusted_operand);
 
-            auto denominator_sum = std::accumulate(denominator->data.begin(),denominator->data.end(), type(0));
+            std::vector<int> strides;
 
-            for (int i = 0; i < operand1->total; i++)
+            int cur_total = 1;
+            for (int i = operand1->dims.size() - 1; i >= 0; i--)
             {
-                    output->data[i] = denominator->data[i]/denominator_sum; // Ensure uninitialized data is handled
+                if (i == this->dim)
+                {
+                    cur_total = 1;
+                }
+                cur_total *= operand1->dims[i];
+                strides.push_back(cur_total);
+            }
+            std::reverse(strides.begin(), strides.end());
+
+            std::cout << "this->dim : "<<this->dim <<std::endl;
+            
+
+            std::vector<type> totals((operand1->total/operand1->dims[this->dim]),0);
+            int totals_idx =0;
+            int count=0;
+            std::vector<int> counts(strides.size(),0);
+            
+        
+            int dims_last_idx=counts.size()-1;
+
+            type sum=type(0);
+            
+            while(count != operand1->total)
+            {
+                int idx = 0;
+
+                for(int i=0;i<counts.size();i++)
+                {
+                    idx+=counts[i];
+                }
+                sum+=expd_tensor->data[idx];
+                counts[this->dim]++;
+                count++;
+                if(counts[this->dim]==operand1->dims[this->dim])
+                {
+                    totals[totals_idx++]=sum;
+                    sum=type(0);
+                    for (int i = strides.size() - 1; i >= 0; --i)
+                    {
+                        counts[i]++;
+                        if (counts[i] < operand1->dims[i])
+                        {
+                            if(i!=this->dim)
+                            counts[this->dim]=0;
+                            break;
+                        }
+                        counts[i] = 0;
+                    }
+                }
+
+            }
+            
+            std::cout << "inside" << std::endl;
+            
+            count = 0;
+            totals_idx=0;
+            while(count != operand1->total)
+            {
+                int idx = 0;
+
+                for(int i=0;i<counts.size();i++)
+                {
+                    idx+=counts[i];
+                }
+                output->data[idx]=expd_tensor->data[idx]/totals[totals_idx];
+                counts[this->dim]++;
+                count++;
+                if(counts[this->dim]==operand1->dims[this->dim])
+                {
+                    totals_idx++;
+                    for (int i = strides.size() - 1; i >= 0; --i)
+                    {
+                        counts[i]++;
+                        if (counts[i] < operand1->dims[i])
+                        {
+                            if(i!=this->dim)
+                            counts[this->dim]=0;
+                            break;
+                        }
+                        counts[i] = 0;
+                    }
+
+                }
+
             }
 
-            output->previous_nodes.push_back(denominator);
-            
+            output->previous_nodes.push_back(operand1);
+
             return output;
         }
 
@@ -102,13 +186,12 @@ namespace synaptic
             std::cout << "inside backprop" << std::endl;
             for (int i = 0; i < output->total; i++)
             {
-                for(int j=0; j < output->total; j++)
+                for (int j = 0; j < output->total; j++)
                 {
-                    if(i==j)
-                    operand1->grad[i] += output->data[i] * (type(1) - output->data[j]) * output->grad[i];
+                    if (i == j)
+                        operand1->grad[i] += output->data[i] * (type(1) - output->data[j]) * output->grad[i];
                     else
-                    operand1->grad[i] += -output->data[i] * output->data[j] * output->grad[i];
-                    
+                        operand1->grad[i] += -output->data[i] * output->data[j] * output->grad[i];
                 }
                 // std::cout<< *operand1 <<std::endl;
             }
@@ -117,7 +200,7 @@ namespace synaptic
         template <typename type>
         void softmax<type>::cpu_backward(std::shared_ptr<tensor<type>> operand1, std::shared_ptr<tensor<type>> output, std::shared_ptr<tensor<type>> operand2)
         {
-            return general_backward(operand1,output,operand2);
+            return general_backward(operand1, output, operand2);
         }
 
     }

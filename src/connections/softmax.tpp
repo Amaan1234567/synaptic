@@ -78,24 +78,25 @@ namespace synaptic
 
             auto expd_tensor = exp->forward(adjusted_operand);
 
-            std::vector<int> strides;
 
-            int cur_total = 1;
-            for (int i = operand1->dims.size() - 1; i >= 0; i--)
+            std::vector<int> strides(operand1->dims.size(), 1);
+            for(int i = operand1->dims.size() - 2; i >= 0; i--)
             {
-                if (i == this->dim)
-                {
-                    cur_total = 1;
-                }
-                cur_total *= operand1->dims[i];
-                strides.push_back(cur_total);
+                strides[i] = strides[i + 1] * operand1->dims[i + 1];
             }
-            std::reverse(strides.begin(), strides.end());
 
             std::cout << "this->dim : "<<this->dim <<std::endl;
             
 
             std::vector<type> totals((operand1->total/operand1->dims[this->dim]),0);
+            std::cout << "totals.size(): "<<totals.size()<<std::endl;
+            std::cout << "operand1->total: " << operand1->total <<std::endl;
+            std::cout << "strides.size(): " << strides.size() << std::endl;
+            std::cout << "strides: ";
+            for(auto ele:strides)
+            std::cout << ele << " ";
+
+            std::cout << std::endl;
             int totals_idx =0;
             int count=0;
             std::vector<int> counts(strides.size(),0);
@@ -111,7 +112,7 @@ namespace synaptic
 
                 for(int i=0;i<counts.size();i++)
                 {
-                    idx+=counts[i];
+                    idx+=counts[i]*strides[i];
                 }
                 sum+=expd_tensor->data[idx];
                 counts[this->dim]++;
@@ -135,6 +136,10 @@ namespace synaptic
 
             }
             
+            for(auto ele: totals)
+            std::cout << ele << " ";
+
+            std::cout << std::endl;
             std::cout << "inside" << std::endl;
             
             count = 0;
@@ -145,13 +150,17 @@ namespace synaptic
 
                 for(int i=0;i<counts.size();i++)
                 {
-                    idx+=counts[i];
+                    idx+=counts[i]*strides[i];
                 }
                 output->data[idx]=expd_tensor->data[idx]/totals[totals_idx];
+
+                std::cout << idx << std::endl;
+
                 counts[this->dim]++;
                 count++;
                 if(counts[this->dim]==operand1->dims[this->dim])
                 {
+                    std::cout << "inside counts update " << std::endl;
                     totals_idx++;
                     for (int i = strides.size() - 1; i >= 0; --i)
                     {
@@ -183,18 +192,57 @@ namespace synaptic
         template <typename type>
         void softmax<type>::general_backward(std::shared_ptr<tensor<type>> operand1, std::shared_ptr<tensor<type>> output, std::shared_ptr<tensor<type>> operand2)
         {
-            std::cout << "inside backprop" << std::endl;
-            for (int i = 0; i < output->total; i++)
+
+            std::vector<int> strides(operand1->dims.size(), 1);
+            for(int i = operand1->dims.size() - 2; i >= 0; i--)
             {
-                for (int j = 0; j < output->total; j++)
-                {
-                    if (i == j)
-                        operand1->grad[i] += output->data[i] * (type(1) - output->data[j]) * output->grad[i];
-                    else
-                        operand1->grad[i] += -output->data[i] * output->data[j] * output->grad[i];
-                }
-                // std::cout<< *operand1 <<std::endl;
+                strides[i] = strides[i + 1] * operand1->dims[i + 1];
             }
+
+            int count=0;
+            std::vector<int> counts(strides.size(),0);
+            
+            while(count != operand1->total)
+            {
+                int idx = 0;
+
+                for(int i=0;i<counts.size();i++)
+                {
+                    idx+=counts[i]*strides[i];
+                }
+                
+                count++;
+                int idx_j = idx;
+                for (int j = 0; j < operand1->dims[this->dim]; j++)
+                {
+                    if (idx == j)
+                        operand1->grad[idx] += output->data[idx] * (type(1) - output->data[idx_j]) * output->grad[idx];
+                    else
+                        operand1->grad[idx] += -output->data[idx] * output->data[idx_j] * output->grad[idx];
+                    
+                    idx_j += strides[this->dim];
+                }
+
+                if(counts[this->dim]==operand1->dims[this->dim])
+                {
+                    for (int i = strides.size() - 1; i >= 0; --i)
+                    {
+                        counts[i]++;
+                        if (counts[i] < operand1->dims[i])
+                        {
+                            if(i!=this->dim)
+                            counts[this->dim]=0;
+                            break;
+                        }
+                        counts[i] = 0;
+                    }
+
+                }
+
+            }
+            
+            /* std::cout << "output : " << std::endl;
+            std::cout << *output << std::endl; */
         }
 
         template <typename type>

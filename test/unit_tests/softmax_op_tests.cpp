@@ -22,10 +22,39 @@ TEST(TensorTest, TensorSoftmax)
     }
 }
 
+TEST(TensorTest, TensorSoftmaxWithDim)
+{
+    auto t4 = std::make_shared<synaptic::tensor<float>>(std::vector<int>{2,1,5,4});
+    t4->data = {-0.1134,  0.4248, -0.1527, -2.1672, -0.3404, -0.0227, -0.8536,  0.8676,
+         0.6832,  1.2603,  1.5935, -0.0618,  0.1267, -0.4367,  0.0468,  0.3713,
+         0.4280, -0.3039, -0.5776,  0.1354, -1.2405, -0.0401,  0.2227,  0.3737,
+        -0.1238,  1.5493, -0.9920, -0.3511,  0.2928,  1.0903,  0.2148, -0.0144,
+        -0.9980, -0.5314, -0.2716, -0.3220,  1.0631,  0.1871,  0.3592,  0.2338};
+    std::cout << "inside" << std::endl;
+    synaptic::connections::softmax<float> softmax = synaptic::connections::softmax<float>(2);
+    auto res = softmax.forward(t4);
+    std::cout << *res << std::endl;
+    std::vector<float> expected = std::vector<float>{0.1428, 0.2062, 0.1099, 0.0190,
+          0.1138, 0.1318, 0.0545, 0.3949,
+          0.3166, 0.4754, 0.6297, 0.1559,
+          0.1815, 0.0871, 0.1341, 0.2404,
+          0.2453, 0.0995, 0.0718, 0.1899,
+
+
+        0.0501, 0.0920, 0.2472, 0.2832,
+          0.1529, 0.4511, 0.0734, 0.1372,
+          0.2320, 0.2850, 0.2453, 0.1921,
+          0.0638, 0.0563, 0.1508, 0.1412,
+          0.5012, 0.1155, 0.2834, 0.2462};
+
+    for (int i = 0; i < res->data.size(); i++)
+    {
+        EXPECT_NEAR(res->data[i], expected[i],0.001);
+    }
+}
+
 TEST(TensorTest, TensorSoftmaxBackpropCheck)
 {
-
-
     auto t4 = std::make_shared<synaptic::tensor<float>>(std::vector<int>{30});
     t4->data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30};
 
@@ -44,8 +73,43 @@ TEST(TensorTest, TensorSoftmaxBackpropCheck)
     std::cout << *t4 << std::endl;
     for (int i = 0; i < res->total; i++)
     {
-        EXPECT_NEAR(t4->grad[i], expected[i],0.00001);
+        EXPECT_NEAR(t4->grad[i], expected[i],0.000001);
     }
 }
 
+
+TEST(TensorTest, TensorSoftmaxBackpropWithDimCheck)
+{
+    auto t4 = std::make_shared<synaptic::tensor<float>>(std::vector<int>{2,1,5,4});
+    t4->data = {-0.1134,  0.4248, -0.1527, -2.1672, -0.3404, -0.0227, -0.8536,  0.8676,
+         0.6832,  1.2603,  1.5935, -0.0618,  0.1267, -0.4367,  0.0468,  0.3713,
+         0.4280, -0.3039, -0.5776,  0.1354, -1.2405, -0.0401,  0.2227,  0.3737,
+        -0.1238,  1.5493, -0.9920, -0.3511,  0.2928,  1.0903,  0.2148, -0.0144,
+        -0.9980, -0.5314, -0.2716, -0.3220,  1.0631,  0.1871,  0.3592,  0.2338};
+    std::cout << "inside" << std::endl;
+    synaptic::connections::softmax<float> softmax = synaptic::connections::softmax<float>(2);
+    auto res = softmax.forward(t4);
+    std::cout << *res << std::endl;
+    
+    std::vector<float> expected = std::vector<float>{ 8.5096e-09, -2.4578e-08,  6.5477e-09,  2.2635e-09,
+           6.7810e-09, -1.5711e-08,  3.2485e-09,  4.7070e-08,
+           1.8874e-08, -5.6676e-08,  3.7534e-08,  1.8584e-08,
+           1.0818e-08, -1.0385e-08,  7.9930e-09,  2.8657e-08,
+           1.4622e-08, -1.1859e-08,  4.2811e-09,  2.2635e-08,
+
+
+         0.0000e+00,  0.0000e+00,  1.4735e-08,  0.0000e+00,
+           0.0000e+00,  0.0000e+00,  4.3732e-09,  0.0000e+00,
+           0.0000e+00,  0.0000e+00,  1.4618e-08,  0.0000e+00,
+           0.0000e+00,  0.0000e+00,  8.9885e-09,  0.0000e+00,
+           0.0000e+00,  0.0000e+00,  1.6889e-08,  0.0000e+00};
+
+
+    res->backprop();
+    std::cout << *t4 << std::endl;
+    for (int i = 0; i < res->total; i++)
+    {
+        EXPECT_NEAR(t4->grad[i], expected[i],0.000001);
+    }
+}
 

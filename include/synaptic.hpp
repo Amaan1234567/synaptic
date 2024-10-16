@@ -4,6 +4,8 @@
 #include "op_enum.hpp"
 #include "tensor.hpp"
 #include "connections.hpp"
+#include "loss_fn.hpp"
+
 
 namespace synaptic
 {

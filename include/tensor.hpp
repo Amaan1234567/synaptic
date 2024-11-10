@@ -5,11 +5,11 @@
 #include <iostream>
 #include <cassert>
 #include <algorithm>
+#include <cmath>
 #include "op_enum.hpp"
 #include "device_enum.hpp"
 #include "abstracts/basic_op.hpp"
 #include "logging.hpp"
-
 
 
 
@@ -70,6 +70,7 @@ namespace synaptic
         static std::shared_ptr<tensor> div(std::shared_ptr<tensor> a, std::shared_ptr<tensor> b);
         static std::shared_ptr<tensor> pow(std::shared_ptr<tensor> a, float pow);
         static std::shared_ptr<tensor> exp(std::shared_ptr<tensor> a);
+        static std::shared_ptr<tensor> log(std::shared_ptr<tensor> a, double base = M_Ef64);
         static std::shared_ptr<tensor> matmul(std::shared_ptr<tensor> a, std::shared_ptr<tensor> b);
         static std::shared_ptr<tensor> transpose(std::shared_ptr<tensor> a, int dim0, int dim1);
         static std::shared_ptr<tensor> reshape(std::shared_ptr<tensor> a, std::vector<int> new_shape);

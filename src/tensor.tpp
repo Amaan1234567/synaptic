@@ -18,6 +18,7 @@
 #include "tensor_reshape.hpp"
 #include "tensor_pow.hpp"
 #include "tensor_exp.hpp"
+#include "tensor_log.hpp"
 
 
 template <typename type>
@@ -127,6 +128,14 @@ std::shared_ptr<synaptic::tensor<type>> synaptic::tensor<type>::exp(std::shared_
     return output;
 }
 
+template <typename type>
+std::shared_ptr<synaptic::tensor<type>> synaptic::tensor<type>::log(std::shared_ptr<tensor> operand1, double base)
+{
+    auto div_impl = std::make_shared<tensor_log<type>>(operand1->device,base); // Use std::make_shared
+    auto output = div_impl->forward(operand1);
+    
+    return output;
+}
 
 template <typename type>
 std::shared_ptr<synaptic::tensor<type>> synaptic::tensor<type>::matmul(std::shared_ptr<synaptic::tensor<type>> operand1, std::shared_ptr<synaptic::tensor<type>> operand2)

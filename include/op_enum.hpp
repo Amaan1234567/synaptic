@@ -10,6 +10,7 @@ enum class op
     divi,
     pow,
     exp,
+    log,
     matmul,
     transpose,
     reshape,

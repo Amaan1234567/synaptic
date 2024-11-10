@@ -4,3 +4,4 @@ CMakeFiles
 build/
 bin
 _deps
+logs.log

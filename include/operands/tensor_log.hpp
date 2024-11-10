@@ -14,7 +14,7 @@ namespace synaptic
     public:
         explicit tensor_log(devices dev = devices::none,float base=M_Ef64) : device(dev), base(base) {}
 
-        double base;
+        double base = M_Ef64 ;
         type log_of_base_precalculated = type(1);
         devices device = devices::none;
 

@@ -64,6 +64,7 @@ namespace synaptic
     template <typename type>
     std::shared_ptr<tensor<type>> tensor_log<type>::general_forward(std::shared_ptr<tensor<type>> operand1, std::shared_ptr<tensor<type>> operand2)
     {
+        std::cout << "base :"<<this->base <<std::endl;
         if(this->base <= type(0))
         {
             LOG_ERROR("tensor_log","base of logarithm can't be negative or 0!!");

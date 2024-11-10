@@ -15,7 +15,7 @@ namespace synaptic
         explicit tensor_log(devices dev = devices::none,float base=M_Ef64) : device(dev), base(base) {}
 
         double base;
-        type log_of_base_precalculated = 1;
+        type log_of_base_precalculated = type(1);
         devices device = devices::none;
 
         // Use std::function instead of function pointer

@@ -12,7 +12,7 @@
 #include "logging.hpp"
 
 #ifndef M_Ef64
-#define M_Ef64 std::log(1.0)
+#define M_Ef64 std::exp(1.0)
 #endif
 
 namespace synaptic

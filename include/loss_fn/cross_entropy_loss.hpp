@@ -13,10 +13,11 @@ namespace synaptic
         {
         public:
 
-            cross_entropy_loss(devices dev = devices::none) : device(dev) {}
+            cross_entropy_loss(devices dev = devices::none,std::string reduction = "mean") : device(dev), reduction(reduction) {}
 
             devices device = devices::none;
-
+            std::string reduction = "mean";
+            std::shared_ptr<tensor<type>> softmaxed_data_store;
             // Use std::function instead of function pointer
             using device_specific_forward = std::function<std::shared_ptr<tensor<type>>(std::shared_ptr<tensor<type>>, std::shared_ptr<tensor<type>>)>;
             using device_specific_backward = std::function<void(std::shared_ptr<tensor<type>>, std::shared_ptr<tensor<type>>, std::shared_ptr<tensor<type>>)>;

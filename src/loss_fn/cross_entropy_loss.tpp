@@ -67,19 +67,29 @@ namespace synaptic
         template <typename type>
         std::shared_ptr<tensor<type>> cross_entropy_loss<type>::general_forward(std::shared_ptr<tensor<type>> operand1, std::shared_ptr<tensor<type>> operand2)
         {
-            //operand1:original  operand2:expected
+            //operand1:prediction  operand2:expected
             synaptic::tensor<type>::common_tensor_compatibility_tests(operand1, operand2);
             //std::cout << "inside" <<std::endl;
-            auto error = operand1 - operand2;
-            auto squared_error = tensor<type>::pow(error,2);
+            
+            auto softmax = std::make_shared<synaptic::connections::softmax<type>>(operand1->dims.size()-1);
+
+            auto softmax_output = softmax->forward(operand1);
+
+            
+            auto log_of_expected = tensor<type>::log(softmax_output);
 
             auto output = std::make_shared<tensor<type>>(std::vector<int>{1});
 
             type sum = type(0);
 
-            for(auto ele: squared_error->data)
-            sum += ele;
-            output->data[0] = sum/(type(operand1->total));
+            for(int i=0;i<operand1->total;i++)
+            sum += operand2->data[i]*log_of_expected->data[i];
+
+            std::cout << "sum: "<<sum << std::endl;
+            if(this->reduction == "mean")
+            output->data[0] = (-sum)/(type(operand1->dims[0]));
+
+            this->softmaxed_data_store = softmax_output;
             output->operand_obj_ptr = std::make_shared<cross_entropy_loss<type>>(*this);
             
             output->previous_nodes.push_back(operand1);
@@ -96,13 +106,12 @@ namespace synaptic
         template <typename type>
         void cross_entropy_loss<type>::general_backward(std::shared_ptr<tensor<type>> operand1, std::shared_ptr<tensor<type>> output, std::shared_ptr<tensor<type>> operand2)
         {
-            auto res = (operand1 - operand2)/type(operand1->total);
+            std::cout <<"softmax_output: "<<*operand1 <<std::endl;
+            auto res = (this->softmaxed_data_store-operand2)/type(operand1->dims[0]);
             for(int i =0; i<operand1->total;i++)
             {
-                operand1->grad[i] = 2*res->data[i] * output->grad[i];
-                operand2->grad[i] = -2*res->data[i] * output->grad[i];
+                operand1->grad[i] += res->data[i] * output->grad[i];
             }
-
         }
 
         template <typename type>

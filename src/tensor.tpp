@@ -168,7 +168,7 @@ template <typename type>
 void synaptic::tensor<type>::recursive_backprop(std::shared_ptr<synaptic::tensor<type>> cur)
 {
     
-    std::cout << cur->previous_nodes.size() << std::endl;
+    std::cout <<"cur->previous_nodes.size(): "<<cur->previous_nodes.size() << std::endl;
 
     // cur->operand_obj_ptr->backward(cur->previous_nodes[0], cur, cur->previous_nodes[1]);
     // std::cout <<  << std::endl;
@@ -177,10 +177,13 @@ void synaptic::tensor<type>::recursive_backprop(std::shared_ptr<synaptic::tensor
         LOG_DEBUG("tensor class","backward");
         cur->operand_obj_ptr->backward(cur->previous_nodes[0], cur, cur->previous_nodes[1]);
         LOG_DEBUG("tensor class","backward done");
-
+        std::cout<<"cur->previous_nodes[0] data:"<<*cur->previous_nodes[0];
     }
     else if (cur->previous_nodes.size() == 1)
+    {
         cur->operand_obj_ptr->backward(cur->previous_nodes[0], cur);
+        std::cout<<"cur->previous_nodes[0] data:"<<*cur->previous_nodes[0];
+    }
     else
         return;
 

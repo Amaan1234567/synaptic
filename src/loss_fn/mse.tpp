@@ -99,8 +99,8 @@ namespace synaptic
             auto res = (operand1 - operand2)/type(operand1->total);
             for(int i =0; i<operand1->total;i++)
             {
-                operand1->grad[i] = 2*res->data[i] * output->grad[i];
-                operand2->grad[i] = -2*res->data[i] * output->grad[i];
+                operand1->grad[i] += 2*res->data[i] * output->grad[i];
+                operand2->grad[i] += -2*res->data[i] * output->grad[i];
             }
 
         }

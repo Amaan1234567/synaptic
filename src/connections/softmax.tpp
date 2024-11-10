@@ -192,7 +192,7 @@ namespace synaptic
         template <typename type>
         void softmax<type>::general_backward(std::shared_ptr<tensor<type>> operand1, std::shared_ptr<tensor<type>> output, std::shared_ptr<tensor<type>> operand2)
         {
-
+            std::cout << "inside softmax backward "<<std::endl;
             std::vector<int> strides(operand1->dims.size(), 1);
             for(int i = operand1->dims.size() - 2; i >= 0; i--)
             {

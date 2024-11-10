@@ -11,8 +11,9 @@
 #include "abstracts/basic_op.hpp"
 #include "logging.hpp"
 
-
-
+#ifndef M_Ef64
+#define M_Ef64 std::log(1.0)
+#endif
 
 namespace synaptic
 {

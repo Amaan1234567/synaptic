@@ -34,15 +34,13 @@ endif()
 message(STATUS "Log file: ${LOG_FILE}")
 
 
-include_directories(${CMAKE_SOURCE_DIR}/test)
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/include/logging)
 include_directories(${CMAKE_SOURCE_DIR}/include/connections)
 include_directories(${CMAKE_SOURCE_DIR}/include/loss_fn)
+include_directories(${CMAKE_SOURCE_DIR}/include/layers)
+include_directories(${CMAKE_SOURCE_DIR}/include/rng_for_tensor)
 include_directories(${CMAKE_SOURCE_DIR}/include/operands)
-include_directories(${CMAKE_SOURCE_DIR}/src/connections)
-include_directories(${CMAKE_SOURCE_DIR}/src/operands)
-include_directories(${CMAKE_SOURCE_DIR}/src/logging)
 
 
 # GoogleTest integration
@@ -60,15 +58,26 @@ enable_testing()
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-file(GLOB test_sources "${CMAKE_CURRENT_SOURCE_DIR}/unit_tests/*.cpp")
-add_executable(tests "${test_sources}")
 
-target_sources(tests PRIVATE ${CMAKE_SOURCE_DIR}/src/logging/logging.cpp)
-add_compile_definitions(tests PRIVATE LOG_LEVEL=${LOG_LEVEL})
-add_compile_definitions(tests PRIVATE LOG_FILE="${LOG_FILE}")
+file(GLOB unit_test_sources "${CMAKE_CURRENT_SOURCE_DIR}/unit_tests/*.cpp")
+add_executable(unit_tests "${unit_test_sources}")
+
+
+target_sources(unit_tests PRIVATE ${CMAKE_SOURCE_DIR}/src/logging/logging.cpp)
+add_compile_definitions(unit_tests PRIVATE LOG_LEVEL=${LOG_LEVEL})
+add_compile_definitions(unit_tests PRIVATE LOG_FILE="${LOG_FILE}")
+
+file(GLOB integration_test_sources "${CMAKE_CURRENT_SOURCE_DIR}/integration_tests/*.cpp")
+add_executable(integration_tests "${integration_test_sources}")
+
+target_sources(integration_tests PRIVATE ${CMAKE_SOURCE_DIR}/src/logging/logging.cpp)
+add_compile_definitions(integration_tests PRIVATE LOG_LEVEL=${LOG_LEVEL})
+add_compile_definitions(integration_tests PRIVATE LOG_FILE="${LOG_FILE}")
 
 # Link GoogleTest with the test executable
-target_link_libraries(tests gtest gtest_main)
+target_link_libraries(unit_tests gtest gtest_main)
+target_link_libraries(integration_tests gtest gtest_main)
 
 # Register the test
-add_test(NAME run_all_tests COMMAND tests)
+add_test(NAME unit_tests COMMAND unit_tests)
+add_test(NAME integration_tests COMMAND integration_tests)

@@ -1,6 +1,4 @@
-#ifndef CONNECTIONS_HPP
-#define CONNECTIONS_HPP
-
+#pragma once
 #include "connections/relu.hpp"
 #include "connections/sigmoid.hpp"
 #include "connections/tanh.hpp"
@@ -12,7 +10,7 @@ namespace synaptic
 {
     namespace connections
     {
-        // You can declare other connection types or functions related to synaptic::connections here.
+        
     }
 }
-#endif
+

@@ -42,17 +42,31 @@ TEST(TensorTest, NormalNeuralNetworkTest)
 
     auto loss_fn = synaptic::loss_fn::mse<float>();
     int epochs=100;
+    int iters = 100;
+    int batch_size=10;
     for(int epoch=1;epoch<=epochs;epoch++)
     {
-        auto res = input_layer.forward(input_train);
-        res = act.forward(res);
-        res = hidden_layer.forward(res);
-        res = act.forward(res);
-        res = output_layer.forward(res);
-        res = final_act.forward(res);
+        for(int iter=1;iter<=iters;iter++)
+        {
+            auto x = std::make_shared<tensor<float>>(std::vector<int>{batch_size,1});
+            auto y = std::make_shared<tensor<float>>(std::vector<int>{batch_size,1});
+            for(int i = 0;i<x->total;i++)
+            {
+                int idx = rand()%1000;
+                x->data[i] = input_train->data[idx];
+                y->data[i] = output_train->data[idx];
+            }
+            auto res = input_layer.forward(x);
+            res = act.forward(res);
+            res = hidden_layer.forward(res);
+            res = act.forward(res);
+            res = output_layer.forward(res);
+            res = final_act.forward(res);
 
-        auto loss = loss_fn.forward(res,output_train);
-        std::cout<<"loss: "<<loss->data[0]<<std::endl;
+            auto loss = loss_fn.forward(res,y);
+            std::cout<<"loss: "<<loss->data[0]<<std::endl;
+        }
+        
     }
     EXPECT_EQ(1,1);
 }

@@ -16,7 +16,7 @@ namespace synaptic
 
             randn(std::vector<int> shape,float lower_limit=0,float higher_limit=1,devices dev = devices::none,unsigned int seed = time(NULL)) : device(dev),lower_limit(lower_limit),higher_limit(higher_limit),output_shape(shape){}
             float lower_limit = 0;
-            float higher_limit = 0;
+            float higher_limit = 1;
             unsigned int seed = time(NULL);
             std::vector<int> output_shape;
             devices device = devices::none;

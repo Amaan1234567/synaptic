@@ -68,7 +68,9 @@ namespace synaptic
         std::shared_ptr<tensor<type>> linear<type>::general_forward(std::shared_ptr<tensor<type>> operand1, std::shared_ptr<tensor<type>> operand2)
         {
 
-            auto output = tensor<type>::matmul(operand1,this->weights);
+            auto res = tensor<type>::matmul(operand1,this->weights);
+            auto output = res + this->biases;
+            std::cout <<"output from linear forward "<<*res << std::endl;
             return output;
         }
 

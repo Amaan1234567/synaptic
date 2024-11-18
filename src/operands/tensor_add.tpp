@@ -70,6 +70,9 @@ namespace synaptic
     {
         // Perform compatibility tests
         synaptic::tensor<type>::common_tensor_compatibility_tests(operand1, operand2);
+        bool batch=false;
+        if(operand1->dims[0]!=operand2->dims[0])
+        batch=true;
         auto output = std::make_shared<tensor<type>>(operand1->dims);
         output->previous_nodes.push_back(operand1);
         output->previous_nodes.push_back(operand2);
@@ -78,11 +81,26 @@ namespace synaptic
 
         // std::cout << "address of new pointer created: "<< output->operand_obj_ptr << std::endl;
         //  Assuming both operands have the same size
-        for (size_t i = 0; i < operand1->data.size(); ++i)
+        if(batch==false)
         {
-            output->data[i] = operand1->data[i] + operand2->data[i];
+            for (size_t i = 0; i < operand1->data.size(); ++i)
+            {
+                output->data[i] = operand1->data[i] + operand2->data[i];
+            }
+            return output;
         }
-        return output;
+        else
+        {   
+            //temp need to fix this, make it work for all types of tensors
+            for(int batch=0;batch<operand1->dims[0];batch++)
+            {
+                for (size_t i = 0; i < operand1->data.size(); ++i)
+                {
+                    output->data[operand1->dims[0]*batch+i] = operand1->data[i] + operand2->data[i];
+                }
+            }
+            return output;
+        }
     }
 
     template <typename type>

@@ -7,7 +7,7 @@ set(ERROR 3)
 set(CRITICAL 4)
 set(LOG_LEVEL ${INFO})  # INFO level by default
 
-option(LOG_LEVEL_DEBUG "Show warning + error + info + debug messages" ON)
+option(LOG_LEVEL_DEBUG "Show warning + error + info + debug messages" OFF)
 option(LOG_LEVEL_INFO "Show warning + error + info messages" OFF)
 option(LOG_LEVEL_WARNING "Show warrning + error messages" OFF)
 option(LOG_LEVEL_ERROR "Show error messages" OFF)

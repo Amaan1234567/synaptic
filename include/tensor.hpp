@@ -80,7 +80,7 @@ namespace synaptic
         void backprop();
     };
 
-}
+};
 
 // Overloaded operators for tensor
 template <typename type>

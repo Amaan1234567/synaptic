@@ -14,7 +14,7 @@ namespace synaptic
         explicit tensor_add(devices dev = devices::none) : device(dev) {}
 
         devices device = devices::none;
-
+        bool batch=false;
         // Use std::function instead of function pointer
         using device_specific_forward = std::function<std::shared_ptr<tensor<type>>(std::shared_ptr<tensor<type>>, std::shared_ptr<tensor<type>>)>;
         using device_specific_backward = std::function<void(std::shared_ptr<tensor<type>>, std::shared_ptr<tensor<type>>, std::shared_ptr<tensor<type>>)>;

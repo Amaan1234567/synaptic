@@ -22,6 +22,52 @@ TEST(TensorTest, AdditionOfTwoTensors)
     }
 }
 
+TEST(TensorTest, AdditionOfTwoTensorsWithDifferentBatchSizes)
+{
+    auto t1 = std::make_shared<tensor<float>>(std::vector<int>{16,5});
+    auto t2 = std::make_shared<tensor<float>>(std::vector<int>{1,5});
+    t1->data = {3.,  2.,  1.,  9.,  3.,
+         3.,  6.,  5.,  4.,  6.,
+         6.,  6.,  9.,  2.,  9.,
+         8.,  9.,  5.,  1.,  6.,
+         7.,  7.,  9.,  5.,  8.,
+         5.,  2.,  6.,  4.,  9.,
+         9.,  5.,  6.,  6.,  2.,
+        10.,  7.,  2.,  8.,  8.,
+         5.,  9., 10.,  6.,  7.,
+         5.,  6.,  6.,  5.,  4.,
+         6.,  4.,  9.,  3.,  7.,
+         7.,  5.,  6.,  7., 10.,
+         9.,  6.,  6.,  8., 10.,
+         2.,  6., 10.,  9.,  4.,
+         8.,  9.,  5.,  1.,  7.,
+         5., 10.,  2., 10., 10.};
+    t2->data = {10.,  5.,  5.,  5.,  9.};
+
+    auto res = t1 + t2;
+    std::vector<float> expected = {13.,  7.,  6., 14., 12.,
+        13., 11., 10.,  9., 15.,
+        16., 11., 14.,  7., 18.,
+        18., 14., 10.,  6., 15.,
+        17., 12., 14., 10., 17.,
+        15.,  7., 11.,  9., 18.,
+        19., 10., 11., 11., 11.,
+        20., 12.,  7., 13., 17.,
+        15., 14., 15., 11., 16.,
+        15., 11., 11., 10., 13.,
+        16.,  9., 14.,  8., 16.,
+        17., 10., 11., 12., 19.,
+        19., 11., 11., 13., 19.,
+        12., 11., 15., 14., 13.,
+        18., 14., 10.,  6., 16.,
+        15., 15.,  7., 15., 19.};
+
+    for (int i = 0; i < res->total; i++) {
+        EXPECT_FLOAT_EQ(res->data[i], expected[i]);
+
+    }
+}
+
 TEST(TensorTest, AdditionOfTwoTensorsBackpropCheck)
 {
     auto t1 = std::make_shared<tensor<float>>(std::vector<int>{2});
@@ -37,6 +83,41 @@ TEST(TensorTest, AdditionOfTwoTensorsBackpropCheck)
         EXPECT_FLOAT_EQ(t1->grad[i], expected[i]);
         EXPECT_FLOAT_EQ(t2->grad[i], expected[i]);
         
+    }
+}
+
+TEST(TensorTest, AdditionOfTwoTensorsWithDifferentBatchSizeBackpropCheck)
+{
+    auto t1 = std::make_shared<tensor<float>>(std::vector<int>{16,5});
+    auto t2 = std::make_shared<tensor<float>>(std::vector<int>{1,5});
+    t1->data = {3.,  2.,  1.,  9.,  3.,
+         3.,  6.,  5.,  4.,  6.,
+         6.,  6.,  9.,  2.,  9.,
+         8.,  9.,  5.,  1.,  6.,
+         7.,  7.,  9.,  5.,  8.,
+         5.,  2.,  6.,  4.,  9.,
+         9.,  5.,  6.,  6.,  2.,
+        10.,  7.,  2.,  8.,  8.,
+         5.,  9., 10.,  6.,  7.,
+         5.,  6.,  6.,  5.,  4.,
+         6.,  4.,  9.,  3.,  7.,
+         7.,  5.,  6.,  7., 10.,
+         9.,  6.,  6.,  8., 10.,
+         2.,  6., 10.,  9.,  4.,
+         8.,  9.,  5.,  1.,  7.,
+         5., 10.,  2., 10., 10.};
+    t2->data = {10.,  5.,  5.,  5.,  9.};
+
+    auto res = t1 + t2;
+    std::vector<float> expected1(t1->total,1.0);
+    std::vector<float> expected2(t2->total,int(t1->dims[0]));
+    res->backprop();
+    for (size_t i = 0; i < res->total; i++) {
+        EXPECT_FLOAT_EQ(t1->grad[i], expected1[i]);  
+    }
+    for(size_t i = 0;i<t2->total;i++)
+    {
+        EXPECT_FLOAT_EQ(t2->grad[i], expected2[i]);
     }
 }
 

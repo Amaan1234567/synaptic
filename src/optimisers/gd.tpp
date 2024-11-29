@@ -11,7 +11,7 @@ namespace synaptic
             {
                 for(int i=0;i<ele->total;i++)
                 {
-                    ele->data[i] += ele->grad[i]*this->learning_rate;
+                    ele->data[i] -= ele->grad[i]*this->learning_rate;
                 }
             }
         }

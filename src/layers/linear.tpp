@@ -1,6 +1,6 @@
 #include "../../include/layers/linear.hpp"
 #include "../../include/device_enum.hpp"
-#include "../../include/operands/tensor_pow.hpp"
+#include "../../include/operands/tensor_matmul.hpp"
 #include <cmath>
 
 namespace synaptic
@@ -48,7 +48,7 @@ namespace synaptic
             // Get the appropriate implementation based on the current device
             auto impl = this->get_impl_selector_forward();
             // Call the selected implementation
-            auto output = impl(operand1, operand2);
+            std::shared_ptr<tensor<type>> output = impl(operand1, operand2);
             return output;
         }
 
@@ -68,7 +68,8 @@ namespace synaptic
         std::shared_ptr<tensor<type>> linear<type>::general_forward(std::shared_ptr<tensor<type>> operand1, std::shared_ptr<tensor<type>> operand2)
         {
 
-            auto res = tensor<type>::matmul(operand1,this->weights);
+            auto matmul = tensor_matmul<type>();
+            auto res = matmul.forward(operand1,this->weights);
             auto output = res + this->biases;
             std::cout <<"output from linear forward "<<*res << std::endl;
             return output;

@@ -7,17 +7,17 @@
 #include <ctime>
 using namespace synaptic;
 
-class nn : public synaptic::layers::module<float>
+class nn : public layers::module<float>
     {   
         public:
         
 
-        layers::linear<float> input_layer = synaptic::layers::linear<float>(1,15);
-        layers::linear<float> hidden_layer1 = synaptic::layers::linear<float>(15,10);
-        layers::linear<float> hidden_layer2 = synaptic::layers::linear<float>(10,5);
-        layers::linear<float> output_layer = synaptic::layers::linear<float>(5,1);
-        synaptic::connections::relu<float> act = synaptic::connections::relu<float>();
-        synaptic::connections::tanh<float> final_act = synaptic::connections::tanh<float>();
+        layers::linear<float> input_layer = layers::linear<float>(1,16);
+        layers::linear<float> hidden_layer1 = layers::linear<float>(16,8);
+        layers::linear<float> hidden_layer2 = layers::linear<float>(8,4);
+        layers::linear<float> output_layer = layers::linear<float>(4,1);
+        connections::relu<float> act = connections::relu<float>();
+        connections::tanh<float> final_act = connections::tanh<float>();
 
         void register_modules();
         
@@ -39,15 +39,19 @@ void nn::register_modules()
 
 std::shared_ptr<tensor<float>> nn::forward(std::shared_ptr<tensor<float>> input)
 {
-    auto res = this->input_layer.forward(input);
-    res = this->act.forward(res);
-    res = this->hidden_layer1.forward(res);
-    res = this->act.forward(res);
-    res = this->hidden_layer2.forward(res);
-    res = this->act.forward(res);
-    res = this->output_layer.forward(res);
-    res = this->final_act.forward(res);
-    return res;
+    std::vector<std::shared_ptr<tensor<float>>> res;
+    res.push_back(this->input_layer.forward(input));
+    res.push_back(this->act.forward(res[res.size()-1]));
+    //std::cout << *res[res.size()-1] << std::endl;
+    //std::cout <<&this->hidden_layer1.weights <<std::endl;
+    //std::cout<<*this->hidden_layer1.forward(res[res.size()-1])<<std::endl;
+    res.push_back(this->hidden_layer1.forward(res[res.size()-1]));
+    res.push_back(this->act.forward(res[res.size()-1]));
+    res.push_back(this->hidden_layer2.forward(res[res.size()-1]));
+    res.push_back(this->act.forward(res[res.size()-1]));
+    res.push_back(this->output_layer.forward(res[res.size()-1]));
+    res.push_back(this->final_act.forward(res[res.size()-1]));
+    return res[res.size()-1];
 }
 
 TEST(TensorTest, NormalNeuralNetworkTest)
@@ -59,9 +63,9 @@ TEST(TensorTest, NormalNeuralNetworkTest)
     srand(42);
     for(int i=0;i<input_train->total;i++)
     {
-        float rad = (float)rand()/RAND_MAX;
-        input_train->data[i] = std::sin(rad);
-        output_train->data[i] = rad; 
+        float rad = (float)(-10 + ((float)rand()/RAND_MAX)*(20));
+        input_train->data[i] = rad;
+        output_train->data[i] =std::sin(rad); 
     }
 
 
@@ -70,10 +74,10 @@ TEST(TensorTest, NormalNeuralNetworkTest)
     srand(time(NULL));
     for(int i=0;i<input_test->total;i++)
     {
-        float rad = (float)rand()/RAND_MAX;
-        input_test->data[i] = std::sin(rad);
+        float rad = (float)(-10 + ((float)rand()/RAND_MAX)*(20));
+        input_test->data[i] = rad;
         std::cout <<"sin: "<< std::sin(rad) <<std::endl;
-        output_test->data[i] = rad; 
+        output_test->data[i] = std::sin(rad); 
     }
 
     float total_loss=0.0;
@@ -81,11 +85,11 @@ TEST(TensorTest, NormalNeuralNetworkTest)
     
     auto model = nn();
     
-    auto optim = optimisers::gd<float>(model.optimisation_targets,0.01);
+    auto optim = optimisers::gd<float>(model.optimisation_targets,0.1);
 
     auto loss_fn = loss_fn::mse<float>();
-    int epochs=100;
-    int iters = 100;
+    int epochs=200;
+    int iters = 4;
     int batch_size=16;
     std::vector<float> losses;
     for(int epoch=1;epoch<=epochs;epoch++)
@@ -119,5 +123,17 @@ TEST(TensorTest, NormalNeuralNetworkTest)
     {
         std::cout << ele <<std::endl;
     }
+
+    auto test_predictions = model.forward(input_test);
+    auto test_loss = loss_fn.forward(test_predictions, output_test);
+    std::cout << "Test MSE: " << test_loss->data[0] << std::endl;
+
+    // Loop through the test predictions for detailed output
+    for (int i = 0; i < input_test->total; i++) {
+        std::cout << "Test Input: " << input_test->data[i] 
+                  << " | Predicted: " << test_predictions->data[i] 
+                  << " | Actual: " << output_test->data[i] << std::endl;
+    }
+
     EXPECT_EQ(1,1);
 }

@@ -71,9 +71,18 @@ namespace synaptic
 
             for (int i = 0; i < operand1->total; i++)
             {
-                type data1 = std::exp(operand1->data[i]);
+                /* type data1 = std::exp(operand1->data[i]);
                 type data2 = std::exp(-operand1->data[i]);
-                output->data[i] = (data1-data2)/(data1+data2); 
+                type res = (data1-data2)/(data1+data2);
+                std::cout << data1 << " "<< data2 << " "<<res<<std::endl;
+                if(std::isnan(res))
+                output->data[i] = type(1);
+                else
+                output->data[i] = res; */
+
+                //very cheesy, need to do this properly
+                output->data[i] = std::tanh(operand1->data[i]);
+                
             }
             return output;
         }

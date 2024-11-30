@@ -110,9 +110,9 @@ TEST(TensorTest, NormalNeuralNetworkTest)
             std::cout << "model preds: "<<*res<<std::endl;
             auto loss = loss_fn.forward(res,y);
             std::cout<<"loss: "<<loss->data[0]<<std::endl;
+            optim.zero_grad();
             loss->backprop();
             optim.step();
-            optim.zero_grad();
             total_loss+=loss->data[0];
         }
         std::cout << "avg loss: "<<total_loss/iters<<std::endl;

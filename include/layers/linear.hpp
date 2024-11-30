@@ -16,18 +16,19 @@ namespace synaptic
 
             linear(int in_features,int out_features, devices dev = devices::none) : device(dev) 
             {
-                auto randn = synaptic::rng_for_tensor::randn<type>(std::vector<int>{in_features,out_features},-1,1);
+                auto randn = synaptic::rng_for_tensor::randn<type>(0,std::sqrt(2/in_features));
                 this->weights = randn.generate(std::vector<int>{in_features,out_features});
                 this->biases = randn.generate(std::vector<int>{1,out_features});
 
+                /* this->weights = std::make_shared<tensor<type>>(std::vector<int>{in_features,out_features});
+                this->weights->data = std::vector<type>(this->weights->total,0);
+                this->biases = std::make_shared<tensor<type>>(std::vector<int>{1,out_features});
+                this->biases->data = std::vector<type>(this->biases->total,0); */
                 std::cout << "weights of linear layer :"<<*this->weights<<std::endl;
                 std::cout << "biases of linear layer :"<<*this->biases<<std::endl;
-                /* this->weights = std::make_shared<tensor<type>>(std::vector<int>{in_features,out_features});
-                this->biases = std::make_shared<tensor<type>>(std::vector<int>{1,out_features}); */
                 // basically have the weights of the neurons in each column, no need of transposing anything
                 //with weights initialised randomly
             }
-            
             std::shared_ptr<tensor<type>> weights;
             std::shared_ptr<tensor<type>> biases;
             devices device = devices::none;

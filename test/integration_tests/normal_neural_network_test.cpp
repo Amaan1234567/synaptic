@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
+#include <stdfloat>
 using namespace synaptic;
 
 class nn : public layers::module<float>
@@ -71,7 +72,6 @@ TEST(TensorTest, NormalNeuralNetworkTest)
 
     auto input_test = std::make_shared<tensor<float>>(std::vector<int>{100,1});
     auto output_test = std::make_shared<tensor<float>>(std::vector<int>{100,1});
-    srand(time(NULL));
     for(int i=0;i<input_test->total;i++)
     {
         float rad = (float)(-10 + ((float)rand()/RAND_MAX)*(20));
@@ -85,12 +85,12 @@ TEST(TensorTest, NormalNeuralNetworkTest)
     
     auto model = nn();
     
-    auto optim = optimisers::gd<float>(model.optimisation_targets,0.1);
+    auto optim = optimisers::gd<float>(model.optimisation_targets,1);
 
     auto loss_fn = loss_fn::mse<float>();
     int epochs=200;
-    int iters = 4;
-    int batch_size=16;
+    int iters = 10;
+    int batch_size=4;
     std::vector<float> losses;
     for(int epoch=1;epoch<=epochs;epoch++)
     {

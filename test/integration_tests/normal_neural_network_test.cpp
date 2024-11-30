@@ -5,7 +5,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
-#include <stdfloat>
+
 using namespace synaptic;
 
 class nn : public layers::module<float>

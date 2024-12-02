@@ -13,9 +13,9 @@ class nn : public layers::module<float>
         public:
         
 
-        layers::linear<float> input_layer = layers::linear<float>(1,16);
-        layers::linear<float> hidden_layer1 = layers::linear<float>(16,8);
-        layers::linear<float> hidden_layer2 = layers::linear<float>(8,4);
+        layers::linear<float> input_layer = layers::linear<float>(1,4);
+        layers::linear<float> hidden_layer1 = layers::linear<float>(4,6);
+        layers::linear<float> hidden_layer2 = layers::linear<float>(6,4);
         layers::linear<float> output_layer = layers::linear<float>(4,1);
         connections::relu<float> act = connections::relu<float>();
         connections::tanh<float> final_act = connections::tanh<float>();
@@ -85,12 +85,12 @@ TEST(TensorTest, NormalNeuralNetworkTest)
     
     auto model = nn();
     
-    auto optim = optimisers::gd<float>(model.optimisation_targets,1);
+    auto optim = optimisers::gd<float>(model.optimisation_targets,0.001);
 
     auto loss_fn = loss_fn::mse<float>();
-    int epochs=200;
+    int epochs=100;
     int iters = 10;
-    int batch_size=4;
+    int batch_size=8;
     std::vector<float> losses;
     for(int epoch=1;epoch<=epochs;epoch++)
     {
@@ -110,12 +110,15 @@ TEST(TensorTest, NormalNeuralNetworkTest)
             std::cout << "model preds: "<<*res<<std::endl;
             auto loss = loss_fn.forward(res,y);
             std::cout<<"loss: "<<loss->data[0]<<std::endl;
-            optim.zero_grad();
             loss->backprop();
             optim.step();
+            optim.zero_grad();
             total_loss+=loss->data[0];
         }
-        std::cout << "avg loss: "<<total_loss/iters<<std::endl;
+        auto test_predictions = model.forward(input_test);
+        auto test_loss = loss_fn.forward(test_predictions, output_test);
+        std::cout << "Test MSE: " << test_loss->data[0] << std::endl;
+        //std::cout << "avg loss: "<<total_loss/iters<<std::endl;
         losses.push_back(total_loss/iters);
         
     }
@@ -123,9 +126,9 @@ TEST(TensorTest, NormalNeuralNetworkTest)
     {
         std::cout << ele <<std::endl;
     }
-
     auto test_predictions = model.forward(input_test);
     auto test_loss = loss_fn.forward(test_predictions, output_test);
+    std::cout <<"train loss: "<<std::accumulate(losses.begin(),losses.end(),0.0)/losses.size()<<std::endl;
     std::cout << "Test MSE: " << test_loss->data[0] << std::endl;
 
     // Loop through the test predictions for detailed output

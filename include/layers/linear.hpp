@@ -16,7 +16,7 @@ namespace synaptic
 
             linear(int in_features,int out_features, devices dev = devices::none) : device(dev) 
             {
-                auto randn = synaptic::rng_for_tensor::randn<type>(0,std::sqrt(2/in_features));
+                auto randn = synaptic::rng_for_tensor::randn<type>(0,std::sqrt(2.0/in_features));
                 this->weights = randn.generate(std::vector<int>{in_features,out_features});
                 this->biases = randn.generate(std::vector<int>{1,out_features});
 

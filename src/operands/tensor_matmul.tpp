@@ -166,7 +166,7 @@ namespace synaptic
 
         auto res1 = tensor_matmul<type>::forward(grad, transpose_impl1->forward(operand2));
         auto res2 = tensor_matmul<type>::forward(transpose_impl2->forward(operand1), grad);
-
+        
         operand1->grad = res1->data;
         operand2->grad = res2->data;
     }

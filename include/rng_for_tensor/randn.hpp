@@ -5,6 +5,7 @@
 #include <functional>
 #include <cstdlib>
 #include <random>
+#include <chrono>
 
 namespace synaptic
 {
@@ -15,10 +16,10 @@ namespace synaptic
         {
         public:
 
-            randn(float mean = 0,float standard_deviation = 1,devices dev = devices::none,unsigned int seed = time(NULL)) : device(dev),mean(mean),standard_deviation(standard_deviation){}
-            float mean=0;
-            float standard_deviation = 1;
-            unsigned int seed = time(NULL);
+            randn(float mean = 0,float standard_deviation = 1.0,devices dev = devices::none,unsigned int seed = std::random_device{}()) : device(dev),mean(mean),standard_deviation(standard_deviation),seed(seed){}
+            float mean=0.0;
+            float standard_deviation = 1.0;
+            unsigned int seed = std::random_device{}();
             std::vector<int> output_shape;
             devices device = devices::none;
 

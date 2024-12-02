@@ -110,7 +110,7 @@ namespace synaptic
             auto res = (this->softmaxed_data_store-operand2)/type(operand1->dims[0]);
             for(int i =0; i<operand1->total;i++)
             {
-                operand1->grad[i] += res->data[i] * output->grad[i];
+                operand1->grad[i] += res->data[i] * output->grad[0];
             }
         }
 

@@ -19,7 +19,7 @@
     {
       "name": "default",
       "configurePreset": "ninja",
-      "jobs": 6
+      "jobs": 8
     }
   ]
 }

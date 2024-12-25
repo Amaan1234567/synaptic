@@ -13,10 +13,9 @@ class nn : public layers::module<float>
         public:
         
 
-        layers::linear<float> input_layer = layers::linear<float>(1,4);
-        layers::linear<float> hidden_layer1 = layers::linear<float>(4,6);
-        layers::linear<float> hidden_layer2 = layers::linear<float>(6,4);
-        layers::linear<float> output_layer = layers::linear<float>(4,1);
+        layers::linear<float> input_layer = layers::linear<float>(1,32);
+        layers::linear<float> hidden_layer1 = layers::linear<float>(32,16);
+        layers::linear<float> output_layer = layers::linear<float>(16,1);
         connections::relu<float> act = connections::relu<float>();
         connections::tanh<float> final_act = connections::tanh<float>();
 
@@ -32,8 +31,6 @@ void nn::register_modules()
     this->optimisation_targets.insert(this->input_layer.biases);
     this->optimisation_targets.insert(this->hidden_layer1.weights);
     this->optimisation_targets.insert(this->hidden_layer1.biases);
-    this->optimisation_targets.insert(this->hidden_layer2.weights);
-    this->optimisation_targets.insert(this->hidden_layer2.biases);
     this->optimisation_targets.insert(this->output_layer.weights);
     this->optimisation_targets.insert(this->output_layer.biases);
 }
@@ -47,8 +44,6 @@ std::shared_ptr<tensor<float>> nn::forward(std::shared_ptr<tensor<float>> input)
     //std::cout <<&this->hidden_layer1.weights <<std::endl;
     //std::cout<<*this->hidden_layer1.forward(res[res.size()-1])<<std::endl;
     res.push_back(this->hidden_layer1.forward(res[res.size()-1]));
-    res.push_back(this->act.forward(res[res.size()-1]));
-    res.push_back(this->hidden_layer2.forward(res[res.size()-1]));
     res.push_back(this->act.forward(res[res.size()-1]));
     res.push_back(this->output_layer.forward(res[res.size()-1]));
     res.push_back(this->final_act.forward(res[res.size()-1]));
@@ -64,7 +59,7 @@ TEST(TensorTest, NormalNeuralNetworkTest)
     srand(42);
     for(int i=0;i<input_train->total;i++)
     {
-        float rad = (float)(-10 + ((float)rand()/RAND_MAX)*(20));
+        float rad = (float)(-M_PIf32 + ((float)rand()/RAND_MAX)*(2*(M_PIf32)));
         input_train->data[i] = rad;
         output_train->data[i] =std::sin(rad); 
     }
@@ -74,7 +69,7 @@ TEST(TensorTest, NormalNeuralNetworkTest)
     auto output_test = std::make_shared<tensor<float>>(std::vector<int>{100,1});
     for(int i=0;i<input_test->total;i++)
     {
-        float rad = (float)(-10 + ((float)rand()/RAND_MAX)*(20));
+        float rad = (float)(-M_PIf32 + ((float)rand()/RAND_MAX)*(2*(M_PIf32)));
         input_test->data[i] = rad;
         std::cout <<"sin: "<< std::sin(rad) <<std::endl;
         output_test->data[i] = std::sin(rad); 
@@ -85,12 +80,12 @@ TEST(TensorTest, NormalNeuralNetworkTest)
     
     auto model = nn();
     
-    auto optim = optimisers::gd<float>(model.optimisation_targets,0.001);
-
+    auto optim = optimisers::gd<float>(0.005);
+    model.register_modules();
     auto loss_fn = loss_fn::mse<float>();
-    int epochs=100;
-    int iters = 10;
-    int batch_size=8;
+    int epochs=2000;
+    int iters = 1;
+    int batch_size=32;
     std::vector<float> losses;
     for(int epoch=1;epoch<=epochs;epoch++)
     {
@@ -111,8 +106,8 @@ TEST(TensorTest, NormalNeuralNetworkTest)
             auto loss = loss_fn.forward(res,y);
             std::cout<<"loss: "<<loss->data[0]<<std::endl;
             loss->backprop();
-            optim.step();
-            optim.zero_grad();
+            optim.step(model.optimisation_targets);
+            optim.zero_grad(model.optimisation_targets);
             total_loss+=loss->data[0];
         }
         auto test_predictions = model.forward(input_test);

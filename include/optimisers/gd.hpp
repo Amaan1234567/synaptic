@@ -12,16 +12,11 @@ namespace synaptic
         class gd
         {
             public:
-            gd(std::set<std::shared_ptr<tensor<type>>> &params,float lr = 0.001) : learning_rate(lr) ,optimisation_targets(params)
-            {
-                
-            }
-
+            gd(float lr = 0.001): learning_rate(lr){};
             float learning_rate=0.001;
-            std::set<std::shared_ptr<tensor<type>>> optimisation_targets;
 
-            void step();
-            void zero_grad();
+            void step(std::set<std::shared_ptr<tensor<type>>> &optimisation_targets);
+            void zero_grad(std::set<std::shared_ptr<tensor<type>>> &optimisation_targets);
         };
     }
 }

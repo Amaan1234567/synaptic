@@ -1,0 +1,8 @@
+.vscode
+./__pycache__
+CMakeFiles
+build/
+bin
+_deps
+logs.log
+output.txt

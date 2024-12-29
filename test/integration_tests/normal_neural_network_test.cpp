@@ -6,6 +6,10 @@
 #include <cstdlib>
 #include <ctime>
 
+#ifndef M_PIf32
+double M_PIf32 = 3.141592653589793238462643383279502884;
+#endif
+
 using namespace synaptic;
 
 class nn : public layers::module<float>
